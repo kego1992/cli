@@ -2,22 +2,15 @@
 
 -- Place logo here --
 
--- Place badges here --
+[![Travis CI](https://secure.travis-ci.org/asyncy/cli.svg?branch=master)](http://travis-ci.org/asyncy/cli)
+[![Codecov](https://codecov.io/gh/asyncy/cli/branch/master/graphs/badge.svg)](https://codecov.io/github/asyncy/cli)
+[![BCH compliance](https://bettercodehub.com/edge/badge/asyncy/cli?branch=master)](https://bettercodehub.com/results/asyncy/cli)
 
 The Asyncy CLI is used to manage Asyncy from the command line.
 
 ## Overview
 
-The goals of this project is to provide a utility for developers to perform the following operations.
-
-1. Create new Asyncy Apps (a 1:1 mapping to a GitHub repository).
-1. Get and set environment variables used when running [stories](#TODO-link-to-stories-docs).
-1. List and filter running stories.
-1. Run or stop a story.
-1. Review current variables in a running story.
-1. Lint and validate [StoryScripts](https://github.com/asyncy/storyscript)
-1. Live tail a stories logs.
-1. Add new containers to their App (with an optional alias mapping)
+The goals of this project is to provide a utility for developers to interact with all of Asyncy features/services.
 
 ## Installation
 
@@ -25,7 +18,7 @@ To be determined.
 
 ## Usage
 
-To be determined.
+Discussion at https://github.com/asyncy/cli/issues/2
 
 ## Issues
 
