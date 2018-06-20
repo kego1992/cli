@@ -71,26 +71,30 @@ def cli():
 
 
 @cli.command()
-@click.option('--email', help='Your email address', prompt=True)
+@click.option('--email', help='Your email address',
+              prompt=True)
+@click.option('--password', help='Password',
+              prompt=True, hide_input=True)
 @click.pass_context
-def login(email):
-    track('CLI Login')
+def login(ctx, email, password):
+    """
+    Login to Asyncy
+    """
     res = requests.post(
         'https://alpha.asyncy.com/login',
-        data={'email': email}
+        data=json.dumps({'email': email, 'password': password})
     )
     if res.status_code == 200:
         write(res.text, '.asyncy/data.json')
         init()
-        click.echo(f"👋 Welcome {data['user']['name']}.")
+        click.echo(f"👋  Welcome {data['user']['name']}.")
         track('Logged into CLI')
         delegator.run('git init')
-        delegator.run('git remote add asyncy http://git.asyncy.com/alpha')
+        delegator.run('git remote add asyncy http://git.asyncy.net/alpha')
         if not os.path.exists('.asyncy/'):
             os.mkdir('.asyncy/')
         click.echo(click.style('√', fg='green') + ' Setup repository.')
         ctx.invoke(update)
-        ctx.invoke(start)
 
     else:
         click.echo('Please signup at ' + click.style('https://asyncy.com', fg='cyan'))
