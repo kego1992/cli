@@ -16,16 +16,16 @@ classifiers = [
 ]
 
 requirements = [
-    'click'
-    'requests'
-    'delegator.py'
-    'storyscript'
-    'mixpanel'
+    'click',
+    'requests',
+    'delegator.py',
+    'storyscript',
+    'mixpanel',
     'raven'
 ]
 
 setup(name='asyncy',
-      version='v0.0.1',
+      version='0.0.1',
       description='Asyncy CLI',
       long_description='',
       classifiers=classifiers,
