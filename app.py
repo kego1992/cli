@@ -35,6 +35,15 @@ def write(content, location):
         file.write(content)
 
 
+def user():
+    """
+    Get the active user
+    """
+    global data
+    assert data
+    return data['user']
+
+
 def init():
     global data
     if os.path.exists('.asyncy/data.json'):
@@ -94,6 +103,7 @@ def update(ctx):
     """
     Pull new updates to the Asyncy Stack
     """
+    assert user()
     track('Update Stack')
     # update compose, pull new containes
     click.echo(click.style('Updating Asyncy', bold=True))
@@ -113,6 +123,7 @@ def start(ctx):
     """
     Start the Asyncy Stack
     """
+    assert user()
     track('Start Stack')
     # start the stack
     click.echo(click.style('Starting Asyncy', bold=True))
@@ -133,6 +144,7 @@ def ls():
     """
     List services and user interfaces
     """
+    assert user()
     track('List Services')
     click.echo(click.style('Services', bold=True))
     click.echo('    Documentation -- ' + click.style('http://docs.asyncy.com', fg='cyan'))
@@ -146,6 +158,7 @@ def test():
     """
     Test the Stories
     """
+    assert user()
     track('Test Stories')
     click.echo(click.style('Compiling Stories', bold=True))
     try:
@@ -173,6 +186,7 @@ def logs(follow):
     """
     Show compose logs
     """
+    assert user()
     track('Show Logs')
     print (follow)
     follow = ' --follow' if follow else ''
@@ -184,6 +198,7 @@ def status():
     """
     Show stack status and health
     """
+    assert user()
     track('Stack Status')
     res = delegator.run('docker-compose -f .asyncy/docker-compose.yml ps')
     click.echo(res.out)
@@ -194,6 +209,7 @@ def shutdown():
     """
     Show stack status and health
     """
+    assert user()
     track('Stack Shutdown')
     stream('docker-compose -f .asyncy/docker-compose.yml down')
 
@@ -205,6 +221,7 @@ def deploy():
 
         git push asyncy master
     """
+    assert user()
     track('Deploy App')
     res = delegator.run('git status -s')
     if res.out != '':
