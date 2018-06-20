@@ -181,14 +181,13 @@ def test():
 
 
 @cli.command()
-@click.option('--follow', '-f', help='Follow the logs')
+@click.option('--follow', '-f', is_flag=True, help='Follow the logs')
 def logs(follow):
     """
     Show compose logs
     """
     assert user()
     track('Show Logs')
-    print (follow)
     follow = ' --follow' if follow else ''
     stream(f'docker-compose -f .asyncy/docker-compose.yml logs{follow}')
 
