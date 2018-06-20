@@ -1,0 +1,5 @@
+.asyncy
+*.egg-info
+build
+dist
+venv

@@ -8,11 +8,35 @@ The goals of this project is to provide a utility for developers to interact wit
 
 ## Installation
 
-To be determined.
+```shell
+$ pip install --user asyncy
+$ asyncy login
+Email:
+```
+
+✨🍰✨
 
 ## Usage
 
-Discussion at https://github.com/asyncy/cli/issues/2
+```shell
+$ asyncy
+
+Usage: asyncy [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  deploy    Deploy your Story project git push asyncy...
+  login
+  logs      Show compose logs
+  ls        List services and user interfaces
+  shutdown  Show stack status and health
+  start     Start the Asyncy Stack
+  status    Show stack status and health
+  test      Test the Stories
+  update    Pull new updates to the Asyncy Stack
+```
 
 ## Issues
 
