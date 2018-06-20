@@ -42,5 +42,5 @@ setup(name='asyncy',
       extras_require={
       },
       entry_points={
-          'console_scripts': ['asyncy=app']
+          'console_scripts': ['asyncy=cli.cli:cli']
       })
