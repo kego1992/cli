@@ -215,7 +215,8 @@ def shutdown():
 
 
 @cli.command()
-def deploy():
+@click.option('--force', '-f', is_flag=True, help='Forse push')
+def deploy(force):
     """
     Deploy your Story project
 
@@ -223,19 +224,20 @@ def deploy():
     """
     assert user()
     track('Deploy App')
-    res = delegator.run('git status -s')
-    if res.out != '':
-        track('Unstagged changes')
-        click.echo(click.style('There are unstagged changes.', fg='red'))
-        click.echo('The following files need to be commited before deploying your app.')
-        click.echo(res.out.replace('?', '--'))
-        click.echo(click.style('Note:', fg='cyan') + ' Asyncy runs ' +
-                   click.style('git push asyncy master', fg='magenta') +
-                   ' to deploy 🚀')
-        sys.exit(1)
-    else:
-        stream('git push asyncy master')
-        track('Deployed App')
+    if not force:
+        res = delegator.run('git status -s')
+        if res.out != '':
+            track('Unstagged changes')
+            click.echo(click.style('There are unstagged changes.', fg='red'))
+            click.echo('The following files need to be commited before deploying your app.')
+            click.echo(res.out.replace('?', '--'))
+            click.echo(click.style('Note:', fg='cyan') + ' Asyncy runs ' +
+                       click.style('git push asyncy master', fg='magenta') +
+                       ' to deploy 🚀')
+            sys.exit(1)
+
+    stream('git push asyncy master')
+    track('Deployed App')
 
 
 if __name__ == '__main__':
