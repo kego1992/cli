@@ -16,6 +16,7 @@ import click_spinner
 mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
 sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
 data = None
+dc = 'docker-compose -f .asyncy/docker-compose.yml'
 
 
 def track(message, extra={}):
@@ -117,10 +118,10 @@ def update(ctx):
         write(res.text, '.asyncy/docker-compose.yml')
     click.echo(click.style('   ->', fg='green') + ' Shutdown the stack')
     with click_spinner.spinner():
-        delegator.run('docker-compose -f .asyncy/docker-compose.yml down')
+        delegator.run(f'{dc} down')
     click.echo(click.style('   ->', fg='green') + ' Pulling new services')
     with click_spinner.spinner():
-        delegator.run('docker-compose -f .asyncy/docker-compose.yml pull')
+        delegator.run(f'{dc} pull')
     ctx.invoke(start)
 
 
@@ -133,14 +134,14 @@ def start(ctx):
     assert user()
     track('Start Stack')
 
-    res = delegator.run('docker-compose -f .asyncy/docker-compose.yml ps -q')
+    res = delegator.run(f'{dc} ps -q')
     if res.out != '':
         click.echo(click.style('Stack is running already.'))
         sys.exit(0)
 
     click.echo(click.style('Starting Asyncy', bold=True))
     with click_spinner.spinner():
-        res = delegator.run('docker-compose -f .asyncy/docker-compose.yml up -d',
+        res = delegator.run(f'{dc} up -d',
                             env=data['environment'])
     if res.return_code != 0:
         click.echo(res.err)
@@ -228,8 +229,10 @@ def logs(follow):
     """
     assert user()
     track('Show Logs')
-    follow = ' --follow' if follow else ''
-    stream(f'docker-compose -f .asyncy/docker-compose.yml logs{follow}')
+    if follow:
+        stream(f'{dc} logs -f')
+    else:
+        click.echo(delegator.run(f'{dc} logs').out)
 
 
 @cli.command()
@@ -239,7 +242,7 @@ def status():
     """
     assert user()
     track('Stack Status')
-    res = delegator.run('docker-compose -f .asyncy/docker-compose.yml ps')
+    res = delegator.run(f'{dc} ps')
     click.echo(res.out)
 
 
@@ -250,7 +253,7 @@ def shutdown():
     """
     assert user()
     track('Stack Shutdown')
-    stream('docker-compose -f .asyncy/docker-compose.yml down')
+    stream(f'{dc} down')
 
 
 @cli.command()
