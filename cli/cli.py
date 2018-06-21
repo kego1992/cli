@@ -183,21 +183,26 @@ def test():
     click.echo(click.style('Compiling Stories', bold=True))
     try:
         stories = App.compile(os.getcwd())
-    except:
+    except Exception as e:
+        track('Stories failed')
         sentry.captureException()
-    write(stories, '.asyncy/stories.json')
-    stories = json.loads(application)
-    if stories['stories'] == {}:
-        click.echo(click.style('   X', fg='red') + ' No stories found')
-        sys.exit(1)
+        click.echo(click.style('X', fg='red') + ' Errors found in Storyscript.')
+        click.echo(str(e))
     else:
-        click.echo(click.style('   √', fg='green') + ' Stories built.')
-        click.echo(click.style('   ?', fg='cyan') + ' Data found at .asyncy/stories.json')
+        track('Stories passed')
+        write(stories, '.asyncy/stories.json')
+        stories = json.loads(application)
+        if stories['stories'] == {}:
+            click.echo(click.style('   X', fg='red') + ' No stories found')
+            sys.exit(1)
+        else:
+            click.echo(click.style('   √', fg='green') + ' Stories built.')
+            click.echo(click.style('   ?', fg='cyan') + ' Data found at .asyncy/stories.json')
 
-    click.echo(click.style('Checking Services', bold=True))
-    click.echo('   👉 TODO')
+        click.echo(click.style('Checking Services', bold=True))
+        click.echo('   👉 TODO')
 
-    click.echo(click.style('√', fg='green') + ' Looking good! 🦄')
+        click.echo(click.style('√', fg='green') + ' Looking good! 🦄')
 
 
 @cli.command()
