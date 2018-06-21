@@ -21,7 +21,7 @@ dc = 'docker-compose -f .asyncy/docker-compose.yml'
 
 def track(message, extra={}):
     global data
-    extra['version'] = 'v0.0.1'
+    extra['version'] = '0.0.2'
     mp.track(str(data['user']['id']), message, extra)
 
 

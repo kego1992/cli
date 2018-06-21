@@ -26,7 +26,7 @@ requirements = [
 ]
 
 setup(name='asyncy',
-      version='0.0.1',
+      version='0.0.2',
       description='Asyncy CLI',
       long_description='',
       classifiers=classifiers,
