@@ -139,7 +139,12 @@ def start(ctx):
     """
     assert user()
     track('Start Stack')
-    # start the stack
+
+    res = delegator.run('docker-compose -f .asyncy/docker-compose.yml ps -q')
+    if res.out != '':
+        click.echo(click.style('Stack is running already.'))
+        sys.exit(0)
+
     click.echo(click.style('Starting Asyncy', bold=True))
     with click_spinner.spinner():
         res = delegator.run('docker-compose -f .asyncy/docker-compose.yml up -d',
