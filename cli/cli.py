@@ -35,6 +35,12 @@ def write(content, location):
         file.write(content)
 
 
+def read(path):
+    path = os.path.join(os.path.dirname(__file__), path)
+    with open(path, 'r') as file:
+        return file.read()
+
+
 def user():
     """
     Get the active user
@@ -182,6 +188,26 @@ def test():
     click.echo('   👉 TODO')
 
     click.echo(click.style('√', fg='green') + ' Looking good! 🦄')
+
+
+@cli.command()
+@click.argument('story', default='-',
+                type=click.Choice(['http', 'every', 'function', '-']))
+def bootstrap(story):
+    """
+    Produce example stories as templates to work from.
+    """
+    assert user()
+    track('Bootstrap story')
+    if story != '-':
+        click.echo(read(f'stories/{story}.story'))
+    else:
+        click.echo(click.style('Choose', bold=True))
+        click.echo(click.style('   http', fg='cyan') + ' - a http endpoint')
+        click.echo(click.style('   function', fg='cyan') + ' - a generic function')
+        click.echo(click.style('   every', fg='cyan') + ' - a periodic call')
+        click.echo('')
+        click.echo('Then run ' + click.style('asyncy bootsrap http', fg='magenta'))
 
 
 @cli.command()
