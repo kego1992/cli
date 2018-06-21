@@ -11,6 +11,7 @@ from storyscript.app import App
 import subprocess
 from mixpanel import Mixpanel
 from raven import Client
+import click_spinner
 
 mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
 sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
@@ -118,12 +119,15 @@ def update(ctx):
     # update compose, pull new containes
     click.echo(click.style('Updating Asyncy', bold=True))
     click.echo(click.style('   ->', fg='green') + ' Update docker-compose.yml')
-    res = requests.get('https://raw.githubusercontent.com/asyncy/stack-compose/master/docker-compose.yml')
-    write(res.text, '.asyncy/docker-compose.yml')
+    with click_spinner.spinner():
+        res = requests.get('https://raw.githubusercontent.com/asyncy/stack-compose/master/docker-compose.yml')
+        write(res.text, '.asyncy/docker-compose.yml')
     click.echo(click.style('   ->', fg='green') + ' Shutdown the stack')
-    delegator.run('docker-compose -f .asyncy/docker-compose.yml down')
+    with click_spinner.spinner():
+        delegator.run('docker-compose -f .asyncy/docker-compose.yml down')
     click.echo(click.style('   ->', fg='green') + ' Pulling new services')
-    delegator.run('docker-compose -f .asyncy/docker-compose.yml pull')
+    with click_spinner.spinner():
+        delegator.run('docker-compose -f .asyncy/docker-compose.yml pull')
     ctx.invoke(start)
 
 
@@ -137,8 +141,9 @@ def start(ctx):
     track('Start Stack')
     # start the stack
     click.echo(click.style('Starting Asyncy', bold=True))
-    res = delegator.run('docker-compose -f .asyncy/docker-compose.yml up -d',
-                        env=data['environment'])
+    with click_spinner.spinner():
+        res = delegator.run('docker-compose -f .asyncy/docker-compose.yml up -d',
+                            env=data['environment'])
     if res.return_code != 0:
         click.echo(res.err)
         click.echo(click.style('Error starting docker', fg='red'))

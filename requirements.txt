@@ -4,3 +4,4 @@ delegator.py
 storyscript
 mixpanel
 raven
+click-spinner

@@ -21,6 +21,7 @@ requirements = [
     'delegator.py',
     'storyscript',
     'mixpanel',
+    'click-spinner',
     'raven'
 ]
 
