@@ -40,8 +40,7 @@ setup(name='asyncy',
       include_package_data=True,
       zip_safe=True,
       install_requires=requirements,
-      extras_require={
-      },
+      extras_require={ },
       entry_points={
           'console_scripts': ['asyncy=cli.cli:cli']
       })

@@ -36,12 +36,6 @@ def write(content, location):
         file.write(content)
 
 
-def read(path):
-    path = os.path.join(os.path.dirname(__file__), path)
-    with open(path, 'r') as file:
-        return file.read()
-
-
 def user():
     """
     Get the active user
@@ -215,7 +209,9 @@ def bootstrap(story):
     assert user()
     track('Bootstrap story')
     if story != '-':
-        click.echo(read(f'stories/{story}.story'))
+        with open(f'cli/stories/{story}.story', 'r') as file:
+            click.echo(file.read())
+        
     else:
         click.echo(click.style('Choose', bold=True))
         click.echo(click.style('   http', fg='cyan') + ' - a http endpoint')
