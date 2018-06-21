@@ -41,8 +41,7 @@ def user():
     Get the active user
     """
     global data
-    assert data
-    return data['user']
+    return (data or {}).get('user')
 
 
 def init():
@@ -211,7 +210,7 @@ def bootstrap(story):
     if story != '-':
         with open(f'cli/stories/{story}.story', 'r') as file:
             click.echo(file.read())
-        
+
     else:
         click.echo(click.style('Choose', bold=True))
         click.echo(click.style('   http', fg='cyan') + ' - a http endpoint')
