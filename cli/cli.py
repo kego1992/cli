@@ -243,7 +243,7 @@ def bootstrap(story):
     assert user()
     track('Bootstrap story')
     if story != '-':
-        with open(os.path.join(os.path.basename(__file__),
+        with open(os.path.join(os.path.dirname(__file__),
                                'stories/{}.story'.format(story)), 'r') as file:
             click.echo(file.read())
 
