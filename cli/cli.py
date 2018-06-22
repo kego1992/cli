@@ -243,7 +243,8 @@ def bootstrap(story):
     assert user()
     track('Bootstrap story')
     if story != '-':
-        with open('cli/stories/{}.story'.format(story), 'r') as file:
+        with open(os.path.join(os.path.basename(__file__),
+                               'stories/{}.story'.format(story)), 'r') as file:
             click.echo(file.read())
 
     else:
