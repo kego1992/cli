@@ -12,6 +12,7 @@ import subprocess
 from mixpanel import Mixpanel
 from raven import Client
 import click_spinner
+import emoji
 
 mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
 sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
@@ -68,7 +69,7 @@ def stream(cmd):
 @click.group()
 def cli():
     """
-    👋  Hello! Welcome to Λsyncy Alpha
+    Hello! Welcome to Λsyncy Alpha
 
     We hope you enjoy and we look forward to your feedback.
 
@@ -93,7 +94,7 @@ def login(ctx, email, password):
     if res.status_code == 200:
         write(res.text, '.asyncy/data.json')
         init()
-        click.echo(f"👋  Welcome {data['user']['name']}.")
+        click.echo(emoji.emojize(f":wave:  Welcome {data['user']['name']}."))
         track('Logged into CLI')
         delegator.run('git init')
         delegator.run('git remote add asyncy http://git.asyncy.net/app')
@@ -213,9 +214,8 @@ def test():
             click.echo(click.style('   ?', fg='cyan') + ' Data found at .asyncy/stories.json')
 
         # click.echo(click.style('Checking Services', bold=True))
-        # click.echo('   👉  TODO')
 
-        click.echo(click.style('√', fg='green') + ' Looking good! 🦄')
+        click.echo(click.style('√', fg='green') + emoji.emojize(' Looking good! :unicorn:'))
 
 
 @cli.command()
@@ -243,14 +243,14 @@ def bootstrap(story):
         click.echo(click.style('   twitter', fg='cyan') + '   - stream tweets')
         click.echo('')
 
-        click.echo(click.style('Coming soon', bold=True) + ' -- Under active development 🖖')
+        click.echo(click.style('Coming soon', bold=True) + ' -- Under active development')
         click.echo(click.style('   slack-bot', fg='cyan') + ' - Slack bot')
         click.echo(click.style('   subscribe', fg='cyan') + ' - event subscriptions')
         click.echo(click.style('   every', fg='cyan') + '     - periodic run this')
         click.echo(click.style('   websocket', fg='cyan') + ' - websocket support')
         click.echo('')
 
-        click.echo('👉  Run ' + click.style('asyncy bootsrap _template_name_', fg='magenta'))
+        click.echo(emoji.emojize(':point_right:  Run ' + click.style('asyncy bootsrap _template_name_', fg='magenta')))
         click.echo('')
 
         click.echo(click.style('More', bold=True))
@@ -329,7 +329,7 @@ def deploy(force):
             click.echo(res.out.replace('?', '--'))
             click.echo(click.style('Note:', fg='cyan') + ' Asyncy runs ' +
                        click.style('git push asyncy master', fg='magenta') +
-                       ' to deploy 🚀')
+                       emoji.emojize(' to deploy :rocket:'))
             sys.exit(1)
 
     stream('git push asyncy master')

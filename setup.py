@@ -22,6 +22,7 @@ requirements = [
     'storyscript',
     'mixpanel',
     'click-spinner',
+    'emoji',
     'raven'
 ]
 

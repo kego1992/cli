@@ -5,3 +5,4 @@ storyscript
 mixpanel
 raven
 click-spinner
+emoji
