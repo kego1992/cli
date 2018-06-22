@@ -1,8 +1,6 @@
 from setuptools import find_packages, setup
 from setuptools.command.install import install
 
-from cli.cli import VERSION
-
 classifiers = [
     'Development Status :: 4 - Beta',
     'Environment :: Console',
@@ -28,7 +26,7 @@ requirements = [
 ]
 
 setup(name='asyncy',
-      version=VERSION,
+      version='0.0.4',
       description='Asyncy CLI',
       long_description='',
       classifiers=classifiers,
