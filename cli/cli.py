@@ -94,7 +94,7 @@ def login(ctx, email, password):
     if res.status_code == 200:
         write(res.text, '.asyncy/data.json')
         init()
-        click.echo(emoji.emojize(":wave:  Welcome {}.".format(data['user']['name'])))
+        click.echo(emoji.emojize(":waving_hand:  Welcome {}.".format(data['user']['name'])))
         track('Logged into CLI')
         delegator.run('git init')
         delegator.run('git remote add asyncy http://git.asyncy.net/app')
@@ -104,7 +104,12 @@ def login(ctx, email, password):
         delegator.run('git add .gitignore && git commit -m "initial commit"')
         click.echo(click.style('√', fg='green') + ' Setup repository.')
         ctx.invoke(update)
-        click.echo(cli.__doc__)
+        click.echo('')
+        click.echo('Success! ' + emoji.emojize(':party_popper:'))
+        click.echo(click.style('Time to write your Story!', bold=True))
+        click.echo('')
+        click.echo('Opening ' + click.style('https://docs.asyncy.com/quick-start/#your-first-story', fg='cyan'))
+        click.launch('https://docs.asyncy.com/quick-start/#your-first-story')
 
     else:
         click.echo('Please signup at ' + click.style('https://asyncy.com', fg='cyan'))
@@ -141,6 +146,16 @@ def update(ctx):
 
 @cli.command()
 @click.pass_context
+def restart(ctx):
+    """
+    Restart the stack
+    """
+    ctx.invoke(shutdown)
+    ctx.invoke(start)
+
+
+@cli.command()
+@click.pass_context
 def start(ctx):
     """
     Start the Asyncy Stack
@@ -158,6 +173,7 @@ def start(ctx):
         res = delegator.run('{} up -d'.format(dc),
                             env=data['environment'])
     click.echo('Done')
+
     if res.return_code != 0:
         click.echo(res.err)
         click.echo(click.style('Error starting docker', fg='red'))
@@ -211,7 +227,7 @@ def test():
 
         # click.echo(click.style('Checking Services', bold=True))
 
-        click.echo(click.style('√', fg='green') + emoji.emojize(' Looking good! :unicorn:'))
+        click.echo(click.style('√', fg='green') + emoji.emojize(' Looking good! :thumbs_up:'))
 
 
 @cli.command()
@@ -246,7 +262,7 @@ def bootstrap(story):
         click.echo(click.style('   websocket', fg='cyan') + ' - websocket support')
         click.echo('')
 
-        click.echo(emoji.emojize(':point_right:  Run ' + click.style('asyncy bootsrap _template_name_', fg='magenta')))
+        click.echo(emoji.emojize(':backhand_index_pointing_right:  Run ' + click.style('asyncy bootsrap _template_name_', fg='magenta')))
         click.echo('')
 
         click.echo(click.style('More', bold=True))
@@ -274,6 +290,7 @@ def feedback():
     """
     Give feedback
     """
+    click.echo('Open https://asyncy.click/feedback')
     click.launch('https://asyncy.click/feedback')
 
 
@@ -303,7 +320,10 @@ def shutdown():
     """
     assert user()
     track('Stack Shutdown')
-    stream('{} down'.format(dc))
+    click.echo(click.style('Shutdown Asyncy... ', bold=True), nl=False)
+    with click_spinner.spinner():
+        delegator.run('{} down'.format(dc))
+    click.echo('Done')
 
 
 @cli.command()
