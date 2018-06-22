@@ -94,7 +94,7 @@ def login(ctx, email, password):
     if res.status_code == 200:
         write(res.text, '.asyncy/data.json')
         init()
-        click.echo(emoji.emojize(f":wave:  Welcome {data['user']['name']}."))
+        click.echo(emoji.emojize(":wave:  Welcome {}.".format(data['user']['name'])))
         track('Logged into CLI')
         delegator.run('git init')
         delegator.run('git remote add asyncy http://git.asyncy.net/app')
@@ -136,8 +136,8 @@ def update(ctx):
 
     click.echo(click.style('   ->', fg='green') + ' Pulling new services... ', nl=False)
     with click_spinner.spinner():
-        delegator.run(f'{dc} pull')
-        delegator.run(f'{dc} down')
+        delegator.run('{} pull'.format(dc))
+        delegator.run('{} down'.format(dc))
     click.echo('Done')
 
     ctx.invoke(start)
@@ -152,14 +152,14 @@ def start(ctx):
     assert user()
     track('Start Stack')
 
-    res = delegator.run(f'{dc} ps -q')
+    res = delegator.run('{} ps -q'.format(dc))
     if res.out != '':
         click.echo(click.style('Stack is running already.'))
         sys.exit(0)
 
     click.echo(click.style('Starting Asyncy... ', bold=True), nl=False)
     with click_spinner.spinner():
-        res = delegator.run(f'{dc} up -d',
+        res = delegator.run('{} up -d'.format(dc),
                             env=data['environment'])
     click.echo('Done')
     if res.return_code != 0:
@@ -231,7 +231,7 @@ def bootstrap(story):
     assert user()
     track('Bootstrap story')
     if story != '-':
-        with open(f'cli/stories/{story}.story', 'r') as file:
+        with open('cli/stories/{}.story'.format(story), 'r') as file:
             click.echo(file.read())
 
     else:
@@ -268,9 +268,9 @@ def logs(follow):
     assert user()
     track('Show Logs')
     if follow:
-        stream(f'{dc} logs -f')
+        stream('{} logs -f'.format(dc))
     else:
-        click.echo(delegator.run(f'{dc} logs').out)
+        click.echo(delegator.run('{} logs'.format(dc)).out)
 
 
 @cli.command()
@@ -296,7 +296,7 @@ def status():
     """
     assert user()
     track('Stack Status')
-    res = delegator.run(f'{dc} ps')
+    res = delegator.run('{} ps'.format(dc))
     click.echo(res.out)
 
 
@@ -307,7 +307,7 @@ def shutdown():
     """
     assert user()
     track('Stack Shutdown')
-    stream(f'{dc} down')
+    stream('{} down'.format(dc))
 
 
 @cli.command()
