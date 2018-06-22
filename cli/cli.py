@@ -17,11 +17,11 @@ mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
 sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
 data = None
 dc = 'docker-compose -f .asyncy/docker-compose.yml'
+VERSION = '0.0.3'
 
 
 def track(message, extra={}):
-    global data
-    extra['version'] = '0.0.2'
+    extra['version'] = VERSION
     mp.track(str(data['user']['id']), message, extra)
 
 
@@ -41,7 +41,6 @@ def user():
     """
     Get the active user
     """
-    global data
     return (data or {}).get('user')
 
 
@@ -68,8 +67,14 @@ def stream(cmd):
 
 @click.group()
 def cli():
-    init()
+    """
+    👋  Hello! Welcome to Λsyncy Alpha
 
+    We hope you enjoy and we look forward to your feedback.
+
+    Docs: https://docs.asyncy.com/cli
+    """
+    init()
 
 @cli.command()
 @click.option('--email', help='Your email address',
@@ -96,6 +101,7 @@ def login(ctx, email, password):
             os.mkdir('.asyncy/')
         click.echo(click.style('√', fg='green') + ' Setup repository.')
         ctx.invoke(update)
+        click.echo(cli.__doc__)
 
     else:
         click.echo('Please signup at ' + click.style('https://asyncy.com', fg='cyan'))
@@ -197,8 +203,8 @@ def test():
             click.echo(click.style('   √', fg='green') + ' Stories built.')
             click.echo(click.style('   ?', fg='cyan') + ' Data found at .asyncy/stories.json')
 
-        click.echo(click.style('Checking Services', bold=True))
-        click.echo('   👉 TODO')
+        # click.echo(click.style('Checking Services', bold=True))
+        # click.echo('   👉  TODO')
 
         click.echo(click.style('√', fg='green') + ' Looking good! 🦄')
 
@@ -217,12 +223,28 @@ def bootstrap(story):
             click.echo(file.read())
 
     else:
-        click.echo(click.style('Choose', bold=True))
-        click.echo(click.style('   http', fg='cyan') + ' - a http endpoint')
-        click.echo(click.style('   function', fg='cyan') + ' - a generic function')
-        click.echo(click.style('   every', fg='cyan') + ' - a periodic call')
+        click.echo(click.style('Choose a template', bold=True))
+        click.echo(click.style('   http', fg='cyan') + '      - serverless http endpoint')
+        click.echo(click.style('   function', fg='cyan') + '  - generic function')
+        click.echo(click.style('   if', fg='cyan') + '        - if/then')
+        click.echo(click.style('   loop', fg='cyan') + '      - for loop')
+        click.echo(click.style('   twitter', fg='cyan') + '   - stream tweets')
         click.echo('')
-        click.echo('Then run ' + click.style('asyncy bootsrap http', fg='magenta'))
+
+        click.echo(click.style('Coming soon', bold=True) + ' -- Under active development 🖖')
+        click.echo(click.style('   slack-bot', fg='cyan') + ' - Slack bot')
+        click.echo(click.style('   subscribe', fg='cyan') + ' - event subscriptions')
+        click.echo(click.style('   every', fg='cyan') + '     - periodic run this')
+        click.echo(click.style('   websocket', fg='cyan') + ' - websocket support')
+        click.echo('')
+
+        click.echo('👉  Run ' + click.style('asyncy bootsrap _template_name_', fg='magenta'))
+        click.echo('')
+
+        click.echo(click.style('More', bold=True))
+        click.echo('    Examples at ' + click.style('https://github.com/topics/asyncy-example', fg='cyan'))
+        click.echo('    Services at ' + click.style('https://hub.asyncy.com', fg='cyan'))
+        click.echo('')
 
 
 @cli.command()
@@ -237,6 +259,22 @@ def logs(follow):
         stream(f'{dc} logs -f')
     else:
         click.echo(delegator.run(f'{dc} logs').out)
+
+
+@cli.command()
+def feedback():
+    """
+    Give feedback
+    """
+    click.launch('https://asyncy.click/feedback')
+
+
+@cli.command()
+def version():
+    """
+    Show version number
+    """
+    click.echo(VERSION)
 
 
 @cli.command()
@@ -264,7 +302,7 @@ def shutdown():
 @click.option('--force', '-f', is_flag=True, help='Forse push')
 def deploy(force):
     """
-    Deploy your Story project
+    Deploy your application. Alias for
 
         git push asyncy master
     """
@@ -284,6 +322,7 @@ def deploy(force):
 
     stream('git push asyncy master')
     track('Deployed App')
+    click.echo('Your http endpoints resolve to ' + click.style('http://asyncy.net', fg='cyan'))
 
 
 if __name__ == '__main__':
