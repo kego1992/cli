@@ -17,7 +17,7 @@ mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
 sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
 data = None
 dc = 'docker-compose -f .asyncy/docker-compose.yml'
-VERSION = '0.0.3'
+VERSION = '0.0.4'
 
 
 def track(message, extra={}):
@@ -115,22 +115,28 @@ def update(ctx):
     Pull new updates to the Asyncy Stack
     """
     assert user()
-    track('Update Stack')
+    track('Update CLI')
     # update compose, pull new containes
-    click.echo(click.style('Updating Asyncy', bold=True))
-    click.echo(click.style('   ->', fg='green') + ' Update docker-compose.yml... ', nl=False)
+    click.echo(click.style('Updating', bold=True))
+
+    click.echo(click.style('   ->', fg='green') + ' CLI... ', nl=False)
+    with click_spinner.spinner():
+        res = delegator.run('pip install -U asyncy')
+        assert res.return_code == 0, res.err
+    click.echo('Done')
+
+    click.echo(click.style('   ->', fg='green') + ' docker-compose.yml... ', nl=False)
     with click_spinner.spinner():
         res = requests.get('https://raw.githubusercontent.com/asyncy/stack-compose/master/docker-compose.yml')
         write(res.text, '.asyncy/docker-compose.yml')
     click.echo('Done')
-    click.echo(click.style('   ->', fg='green') + ' Shutdown the stack... ', nl=False)
-    with click_spinner.spinner():
-        delegator.run(f'{dc} down')
-    click.echo('Done')
+
     click.echo(click.style('   ->', fg='green') + ' Pulling new services... ', nl=False)
     with click_spinner.spinner():
         delegator.run(f'{dc} pull')
+        delegator.run(f'{dc} down')
     click.echo('Done')
+
     ctx.invoke(start)
 
 
@@ -148,7 +154,7 @@ def start(ctx):
         click.echo(click.style('Stack is running already.'))
         sys.exit(0)
 
-    click.echo(click.style('Starting Asyncy...', bold=True), nl=False)
+    click.echo(click.style('Starting Asyncy... ', bold=True), nl=False)
     with click_spinner.spinner():
         res = delegator.run(f'{dc} up -d',
                             env=data['environment'])
@@ -171,10 +177,11 @@ def ls():
     assert user()
     track('List Services')
     click.echo(click.style('Services', bold=True))
+    click.echo('    Your App --      ' + click.style('http://asyncy.net', fg='cyan'))
+    click.echo('    Metrics --       ' + click.style('http://grafana.asyncy.net', fg='cyan') + ' user & pass = admin')
     click.echo('    Documentation -- ' + click.style('http://docs.asyncy.com', fg='cyan'))
-    click.echo('    Asyncy Hub -- ' + click.style('http://hub.asyncy.com', fg='cyan'))
-    click.echo('    Your App -- ' + click.style('http://asyncy.net', fg='cyan'))
-    click.echo('    Metric Dashboard -- ' + click.style('http://grafana.asyncy.net', fg='cyan'))
+    click.echo('    Asyncy Hub --    ' + click.style('http://hub.asyncy.com', fg='cyan'))
+    click.echo('    Feedback --      ' + click.style('http://asyncy.click/feedback', fg='cyan'))
 
 
 @cli.command()
