@@ -220,7 +220,10 @@ def test():
 
 @cli.command()
 @click.argument('story', default='-',
-                type=click.Choice(['http', 'every', 'function', '-']))
+                type=click.Choice(['http', 'every', 'function',
+                                   'if', 'loop', 'twitter',
+                                   'slack-bot', 'subscribe',
+                                   'every', 'websocket',  '-']))
 def bootstrap(story):
     """
     Produce example stories as templates to work from.
