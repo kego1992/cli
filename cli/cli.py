@@ -17,7 +17,7 @@ mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
 sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
 data = None
 dc = 'docker-compose -f .asyncy/docker-compose.yml'
-VERSION = '0.0.4'
+VERSION = '0.0.5'
 
 
 def track(message, extra={}):
@@ -96,7 +96,7 @@ def login(ctx, email, password):
         click.echo(f"👋  Welcome {data['user']['name']}.")
         track('Logged into CLI')
         delegator.run('git init')
-        delegator.run('git remote add asyncy http://git.asyncy.net/alpha')
+        delegator.run('git remote add asyncy http://git.asyncy.net/app')
         if not os.path.exists('.asyncy/'):
             os.mkdir('.asyncy/')
         write('.asyncy', '.gitignore')
