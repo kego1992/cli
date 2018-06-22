@@ -99,6 +99,8 @@ def login(ctx, email, password):
         delegator.run('git remote add asyncy http://git.asyncy.net/alpha')
         if not os.path.exists('.asyncy/'):
             os.mkdir('.asyncy/')
+        write('.asyncy', '.gitignore')
+        delegator.run('git add .gitignore && git commit -m "initial commit"')
         click.echo(click.style('√', fg='green') + ' Setup repository.')
         ctx.invoke(update)
         click.echo(cli.__doc__)
