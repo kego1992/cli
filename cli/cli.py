@@ -122,11 +122,7 @@ def update(ctx):
     # update compose, pull new containes
     click.echo(click.style('Updating', bold=True))
 
-    click.echo(click.style('   ->', fg='green') + ' CLI... ', nl=False)
-    with click_spinner.spinner():
-        res = delegator.run('pip install -U asyncy')
-        assert res.return_code == 0, res.err
-    click.echo('Done')
+    # Note cannot update via pip install...
 
     click.echo(click.style('   ->', fg='green') + ' docker-compose.yml... ', nl=False)
     with click_spinner.spinner():
