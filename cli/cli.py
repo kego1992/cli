@@ -7,6 +7,7 @@ import json
 import click
 import requests
 import delegator
+from glob import glob
 from storyscript.app import App
 import subprocess
 from mixpanel import Mixpanel
@@ -378,8 +379,9 @@ def support(pager):
         def file(path):
             return path, json.loads(run('exec -T bootstrap cat {}'.format(path)).out or 'null')
 
-        def story(path):
-            pass
+        def read(path):
+            with open(path, 'r') as file:
+                return path, file.read()
 
         def container(id):
             data = json.loads(delegator.run('docker inspect {}'.format(id)).out or '[null]')[0]
@@ -388,7 +390,7 @@ def support(pager):
         bundle = {
             'files': {
                 'volume': dict(map(file, ('/asyncy/config/stories.json', '/asyncy/config/services.json', '/asyncy/config/environment.json'))),
-                'stories': dict(map(story, ()))
+                'stories': dict(map(read, (glob('*.story') + glob('**/*.story'))))
             },
             'logs': run('logs').out.split(),
             'versions': {
