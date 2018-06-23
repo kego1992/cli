@@ -18,6 +18,7 @@ mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
 sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
 data = None
 dc = 'docker-compose -f .asyncy/docker-compose.yml'
+dc_env = {}
 VERSION = '0.0.5'
 
 
@@ -64,6 +65,16 @@ def stream(cmd):
             break
         if output:
             click.echo(output.strip())
+
+
+def run(command):
+    """
+    docker-compose alias
+    """
+    return delegator.run(
+        '{} {}'.format(dc, command),
+        env=data['environment']
+    )
 
 
 @click.group()
@@ -137,8 +148,8 @@ def update(ctx):
 
     click.echo(click.style('   ->', fg='green') + ' Pulling new services... ', nl=False)
     with click_spinner.spinner():
-        delegator.run('{} pull'.format(dc))
-        delegator.run('{} down'.format(dc))
+        run('pull')
+        run('down')
     click.echo('Done')
 
     ctx.invoke(start)
@@ -163,15 +174,14 @@ def start(ctx):
     assert user()
     track('Start Stack')
 
-    res = delegator.run('{} ps -q'.format(dc))
+    res = run('ps -q')
     if res.out != '':
         click.echo(click.style('Stack is running already.'))
         sys.exit(0)
 
     click.echo(click.style('Starting Asyncy... ', bold=True), nl=False)
     with click_spinner.spinner():
-        res = delegator.run('{} up -d'.format(dc),
-                            env=data['environment'])
+        res = run('up -d')
     click.echo('Done')
 
     if res.return_code != 0:
@@ -283,7 +293,7 @@ def logs(follow):
     if follow:
         stream('{} logs -f'.format(dc))
     else:
-        click.echo(delegator.run('{} logs'.format(dc)).out)
+        click.echo(run('logs').out)
 
 
 @cli.command()
@@ -310,8 +320,7 @@ def status():
     """
     assert user()
     track('Stack Status')
-    res = delegator.run('{} ps'.format(dc))
-    click.echo(res.out)
+    click.echo(run('ps').out)
 
 
 @cli.command()
@@ -323,7 +332,7 @@ def shutdown():
     track('Stack Shutdown')
     click.echo(click.style('Shutdown Asyncy... ', bold=True), nl=False)
     with click_spinner.spinner():
-        delegator.run('{} down'.format(dc))
+        run('down')
     click.echo('Done')
 
 
@@ -367,7 +376,7 @@ def support(pager):
     with click_spinner.spinner():
 
         def file(path):
-            return path, json.loads(delegator.run('{} exec bootstrap cat {}'.format(dc, path)).out or 'null')
+            return path, json.loads(run('exec -T bootstrap cat {}'.format(path)).out or 'null')
 
         def story(path):
             pass
@@ -381,12 +390,12 @@ def support(pager):
                 'volume': dict(map(file, ('/asyncy/config/stories.json', '/asyncy/config/services.json', '/asyncy/config/environment.json'))),
                 'stories': dict(map(story, ()))
             },
-            'logs': delegator.run('{} logs'.format(dc)).out,
+            'logs': run('logs').out.split(),
             'versions': {
-                'docker': delegator.run('docker version').out,
-                'docker-compose': delegator.run('docker-compose version').out
+                'docker': delegator.run('docker version').out.split(),
+                'compose': run('version').out.split()
             },
-            'containers': dict(map(container, delegator.run('{} ps -q'.format(dc, file)).out.split()))
+            'containers': dict(map(container, run('ps -q').out.split()))
         }
 
     click.echo('Done')
