@@ -354,5 +354,55 @@ def deploy(force):
     click.echo('Your http endpoints resolve to ' + click.style('http://asyncy.net', fg='cyan'))
 
 
+@cli.command()
+@click.option('--pager', '-p', is_flag=True, help='Review payload only')
+def support(pager):
+    """
+    Upload a support bundle
+    """
+    assert user()
+    track('Support Bundle')
+
+    click.echo(click.style('Building support bundle... ', bold=True), nl=False)
+    with click_spinner.spinner():
+
+        def file(path):
+            return path, json.loads(delegator.run('{} exec bootstrap cat {}'.format(dc, path)).out or 'null')
+
+        def story(path):
+            pass
+
+        def container(id):
+            data = json.loads(delegator.run('docker inspect {}'.format(id)).out or '[null]')[0]
+            return data['Name'], data
+
+        bundle = {
+            'files': {
+                'volume': dict(map(file, ('/asyncy/config/stories.json', '/asyncy/config/services.json', '/asyncy/config/environment.json'))),
+                'stories': dict(map(story, ()))
+            },
+            'logs': delegator.run('{} logs'.format(dc)).out,
+            'versions': {
+                'docker': delegator.run('docker version').out,
+                'docker-compose': delegator.run('docker-compose version').out
+            },
+            'containers': dict(map(container, delegator.run('{} ps -q'.format(dc, file)).out.split()))
+        }
+
+    click.echo('Done')
+
+    if pager:
+        from pygments import highlight
+        from pygments.lexers import JsonLexer
+        from pygments.formatters import TerminalFormatter
+        click.echo_via_pager(highlight(json.dumps(bundle, indent=2), JsonLexer(), TerminalFormatter()))
+
+    else:
+        click.echo(click.style('Uploading support bundle... ', bold=True), nl=False)
+        with click_spinner.spinner():
+            sentry.captureMessage('Support Bundle', extra=bundle)
+        click.echo('Done')
+
+
 if __name__ == '__main__':
     cli()

@@ -6,3 +6,4 @@ mixpanel
 raven
 click-spinner
 emoji
+pygments

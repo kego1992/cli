@@ -23,7 +23,8 @@ requirements = [
     'mixpanel',
     'click-spinner',
     'emoji',
-    'raven'
+    'raven',
+    'pygments'
 ]
 
 setup(name='asyncy',
