@@ -1,0 +1,26 @@
+name: asyncy
+version: 0.0.6
+summary: Asyncy CLI
+description: Asyncy CLI
+grade: devel
+confinement: devmode
+
+apps:
+  asyncy:
+    command: bin/asyncy
+
+parts:
+  asyncy:
+    source: https://github.com/asyncy/cli/archive/0.0.6.tar.gz
+    plugin: python
+    python-version: python3
+    python-packages:
+    - click==6.7
+    - click-spinner==0.1.8
+    - delegator.py==0.1.0
+    - emoji==0.5.0
+    - mixpanel==4.3.2
+    - Pygments==2.2.0
+    - raven==6.9.0
+    - requests==2.19.1
+    - storyscript==0.1.2
