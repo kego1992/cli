@@ -366,12 +366,18 @@ def deploy(force):
 
 @cli.command()
 @click.option('--pager', '-p', is_flag=True, help='Review payload only')
-def support(pager):
+@click.option('--message', '-m',
+              help='A short or long message about what went wrong.')
+def support(pager, message):
     """
     Upload a support bundle
     """
     assert user()
     track('Support Bundle')
+
+    if not pager and not message:
+        click.echo(click.style('Tell us a little about what happened.', bold=True))
+        message = click.prompt('Message')
 
     click.echo(click.style('Building support bundle... ', bold=True), nl=False)
     with click_spinner.spinner():
@@ -385,9 +391,13 @@ def support(pager):
 
         def container(id):
             data = json.loads(delegator.run('docker inspect {}'.format(id)).out or '[null]')[0]
-            return data['Name'], data
+            if data:
+                return data['Name'], data
+            else:
+                return id, None
 
         bundle = {
+            'message': message,
             'files': {
                 'volume': dict(map(file, ('/asyncy/config/stories.json', '/asyncy/config/services.json', '/asyncy/config/environment.json'))),
                 'stories': dict(map(read, (glob('*.story') + glob('**/*.story'))))
@@ -411,7 +421,7 @@ def support(pager):
     else:
         click.echo(click.style('Uploading support bundle... ', bold=True), nl=False)
         with click_spinner.spinner():
-            sentry.captureMessage('Support Bundle', extra=bundle)
+            sentry.captureMessage(f'Support Bundle: {message[:20]}', extra=bundle)
         click.echo('Done')
 
 
