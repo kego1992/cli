@@ -3,7 +3,7 @@ version: 0.0.6
 summary: Asyncy CLI
 description: Asyncy CLI
 grade: devel
-confinement: classic
+confinement: devmode
 
 apps:
   asyncy:
