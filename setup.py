@@ -2,29 +2,27 @@ from setuptools import find_packages, setup
 from setuptools.command.install import install
 
 classifiers = [
-    'Development Status :: 4 - Beta',
+    'Development Status :: 3 - Alpha',
     'Environment :: Console',
-    'Environment :: Plugins',
     'Intended Audience :: Developers',
     'Intended Audience :: System Administrators',
     'License :: OSI Approved :: MIT License',
     'Natural Language :: English',
     'Programming Language :: Python :: 3.6',
     'Topic :: Office/Business',
-    'Topic :: Software Development :: Build Tools',
-    'Topic :: Software Development :: Compilers'
+    'Topic :: Software Development :: Build Tools'
 ]
 
 requirements = [
-    'click',
-    'requests',
-    'delegator.py',
-    'storyscript',
-    'mixpanel',
-    'click-spinner',
-    'emoji',
-    'raven',
-    'pygments'
+    'click==6.7',
+    'click-spinner==0.1.8',
+    'delegator.py==0.1.0',
+    'emoji==0.5.0',
+    'mixpanel==4.3.2',
+    'Pygments==2.2.0',
+    'raven==6.9.0',
+    'requests==2.19.1',
+    'storyscript==0.1.2'
 ]
 
 setup(name='asyncy',

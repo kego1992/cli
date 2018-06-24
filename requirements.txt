@@ -1,9 +1,0 @@
-click
-requests
-delegator.py
-storyscript
-mixpanel
-raven
-click-spinner
-emoji
-pygments
