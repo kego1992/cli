@@ -392,12 +392,12 @@ def support(pager):
                 'volume': dict(map(file, ('/asyncy/config/stories.json', '/asyncy/config/services.json', '/asyncy/config/environment.json'))),
                 'stories': dict(map(read, (glob('*.story') + glob('**/*.story'))))
             },
-            'logs': run('logs').out.split(),
+            'logs': run('logs').out.split('\n'),
             'versions': {
-                'docker': delegator.run('docker version').out.split(),
-                'compose': run('version').out.split()
+                'docker': delegator.run('docker version').out.split('\n'),
+                'compose': run('version').out.split('\n')
             },
-            'containers': dict(map(container, run('ps -q').out.split()))
+            'containers': dict(map(container, run('ps -q').out.split('\n')))
         }
 
     click.echo('Done')
