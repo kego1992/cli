@@ -1,19 +1,23 @@
 import os
+import re
 import sys
 import json
 import click
 import requests
 import delegator
+import storyscript
 from glob import glob
-from storyscript.app import App
 import subprocess
 from mixpanel import Mixpanel
 from raven import Client
 import click_spinner
 import emoji
+from prompt_toolkit.shortcuts import prompt
+
 
 mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
-sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
+# sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
+sentry = Client()
 data = None
 dc = 'docker-compose -f .asyncy/docker-compose.yml'
 dc_env = {}
@@ -161,6 +165,85 @@ def restart(ctx):
     """
     ctx.invoke(shutdown)
     ctx.invoke(start)
+
+
+@cli.command()
+def interact():
+    """
+    Run Storyscript and Asyncy in interactive mode.
+    """
+    from pygments.lexers import PythonLexer
+    from prompt_toolkit.lexers import PygmentsLexer
+    from prompt_toolkit.key_binding import KeyBindings
+
+    context = {}  # TODO should be a ContextTree
+    indent = 0
+    bindings = KeyBindings()
+
+    @bindings.add('s-tab')
+    def _(event):
+        # TODO does not work yet
+        click.echo('s tab')
+        if indent > 0:
+            context.shift()
+            indent -= 1
+
+    # https://python-prompt-toolkit.readthedocs.io/en/latest/
+    click.echo(click.style('Asyncy', fg='magenta') + ' 0.0.1 -- ' + click.style('Storyscript', fg='cyan') + ' 0.0.1')
+    click.echo(click.style('Type "/" for commands and "ctr+r" for history.', bold=True))
+    lexer = PygmentsLexer(PythonLexer)
+    story = []
+    is_variable = re.compile(r'^[a-zA-Z_]\w*$').match
+    should_indent = re.compile(r'.* as (\w+(, )?)+$').match
+
+    # TODO track when data was created for context changes
+    while 1:
+        try:
+            # TODO support for indentation
+            user_input = prompt(f'{" " * indent * 4}> ', lexer=lexer)
+            if user_input:
+                if user_input == '/exit':
+                    sys.exit(0)
+
+                elif user_input == '/save':
+                    to = click.prompt('Path')
+                    if os.path.exists(to):
+                        assert click.confirm('Override')
+                    with open(to, 'w+') as file:
+                        file.write('\n'.join(story) + '\n')
+                        sys.exit(0)
+
+                if is_variable(user_input):
+                    if user_input in context:
+                        # show variable value
+                        click.echo(context[user_input])
+                    else:
+                        click.echo(click.style('UndefinedVariable', fg='red'))
+                    continue
+
+                if should_indent(user_input):
+                    # TODO context.push()
+                    indent += 1
+
+                try:
+                    story.append(user_input)
+                    output = storyscript.loads('\n'.join(story))
+                except Exception as e:
+                    click.echo(click.style(str(e), fg='red'))
+                    continue
+
+                # TODO assert service exist in Hub
+                #      the hub data should be built locally to quicker requests
+
+                # pass data to engine
+                with click_spinner.spinner():
+                    res = requests.post('http://engine.asyncy.net/interact',
+                                        data=output)
+
+                click.echo(res.text)
+
+        except KeyboardInterrupt:
+            pass
 
 
 @cli.command()
