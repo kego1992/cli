@@ -114,6 +114,7 @@ def login(ctx, email, password):
         if not os.path.exists('.asyncy/'):
             os.mkdir('.asyncy/')
         write('.asyncy', '.gitignore')
+        write('', '.asyncy/.history')
         delegator.run('git add .gitignore && git commit -m "initial commit"')
         click.echo(click.style('√', fg='green') + ' Setup repository.')
         ctx.invoke(update)
@@ -170,11 +171,17 @@ def restart(ctx):
 @cli.command()
 def interact():
     """
-    Run Storyscript and Asyncy in interactive mode.
+    Write Storyscript interactively
     """
     from pygments.lexers import PythonLexer
     from prompt_toolkit.lexers import PygmentsLexer
     from prompt_toolkit.key_binding import KeyBindings
+    from prompt_toolkit.history import FileHistory
+    from prompt_toolkit import PromptSession
+    from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+
+    session = PromptSession(history=FileHistory('.asyncy/.history'))
+    auto_suggest = AutoSuggestFromHistory()
 
     context = {}  # TODO should be a ContextTree
     indent = 0
@@ -200,7 +207,9 @@ def interact():
     while 1:
         try:
             # TODO support for indentation
-            user_input = prompt(f'{" " * indent * 4}> ', lexer=lexer)
+            user_input = session.prompt(f'{" " * indent * 4}> ',
+                                        lexer=lexer,
+                                        auto_suggest=auto_suggest)
             if user_input:
                 if user_input == '/exit':
                     sys.exit(0)
