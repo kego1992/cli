@@ -227,9 +227,10 @@ def interact():
         event.app.exit(0)
 
     # TODO capture ctr-d events and exit safely
-    # @kb.add('c-d')
-    # def _(event):
-    #     click.echo(emoji.emojize('\n:sparkles: :shortcake: :sparkles:'))
+    @kb.add('c-d')
+    def _(event):
+        event.app.exit(1)
+
     def bottom_toolbar():
         return [
             ('class:toolbar-key', ' Shift+Tab'),
@@ -267,7 +268,14 @@ def interact():
                                         bottom_toolbar=bottom_toolbar,
                                         style=style,
                                         auto_suggest=auto_suggest)
-            if user_input:
+            if user_input == 0:
+                pass
+
+            elif user_input == 1:
+                click.echo(emoji.emojize('Bye!'))
+                sys.exit(0)
+
+            elif user_input:
                 if user_input == '/exit':
                     sys.exit(0)
 
