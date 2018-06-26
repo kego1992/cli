@@ -74,7 +74,7 @@ def run(command):
     docker-compose alias
     """
     return delegator.run(
-        '{} {}'.format(dc, command),
+        f'{dc} {command}',
         env=data['environment']
     )
 
@@ -107,7 +107,7 @@ def login(ctx, email, password):
     if res.status_code == 200:
         write(res.text, '.asyncy/data.json')
         init()
-        click.echo(emoji.emojize(":waving_hand:  Welcome {}.".format(data['user']['name'])))
+        click.echo(emoji.emojize(f":waving_hand:  Welcome {data['user']['name']}."))
         track('Logged into CLI')
         delegator.run('git init')
         delegator.run('git remote add asyncy http://git.asyncy.net/app')
@@ -189,7 +189,7 @@ def interact():
             indent -= 1
 
     # https://python-prompt-toolkit.readthedocs.io/en/latest/
-    click.echo(click.style('Asyncy', fg='magenta') + ' 0.0.1 -- ' + click.style('Storyscript', fg='cyan') + ' 0.0.1')
+    click.echo(click.style('Λsyncy', fg='magenta') + f' {VERSION} -- ' + click.style('Storyscript', fg='cyan') + f' {storyscript.version}')
     click.echo(click.style('Type "/" for commands and "ctr+r" for history.', bold=True))
     lexer = PygmentsLexer(PythonLexer)
     story = []
@@ -335,7 +335,7 @@ def bootstrap(story):
     track('Bootstrap story')
     if story != '-':
         with open(os.path.join(os.path.dirname(__file__),
-                               'stories/{}.story'.format(story)), 'r') as file:
+                               f'stories/{story}.story'), 'r') as file:
             click.echo(file.read())
 
     else:
@@ -372,7 +372,7 @@ def logs(follow):
     assert user()
     track('Show Logs')
     if follow:
-        stream('{} logs -f'.format(dc))
+        stream(f'{dc} logs -f')
     else:
         click.echo(run('logs').out)
 
@@ -463,14 +463,14 @@ def support(pager, message):
     with click_spinner.spinner():
 
         def file(path):
-            return path, json.loads(run('exec -T bootstrap cat {}'.format(path)).out or 'null')
+            return path, json.loads(run(f'exec -T bootstrap cat {path}').out or 'null')
 
         def read(path):
             with open(path, 'r') as file:
                 return path, file.read()
 
         def container(id):
-            data = json.loads(delegator.run('docker inspect {}'.format(id)).out or '[null]')[0]
+            data = json.loads(delegator.run(f'docker inspect {id}').out or '[null]')[0]
             if data:
                 return data['Name'], data
             else:
