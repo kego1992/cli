@@ -12,7 +12,6 @@ from mixpanel import Mixpanel
 from raven import Client
 import click_spinner
 import emoji
-from prompt_toolkit.shortcuts import prompt
 
 
 mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
@@ -168,6 +167,39 @@ def restart(ctx):
     ctx.invoke(start)
 
 
+class Context:
+    def __init__(self):
+        self._contexts = [{'a':1}]
+
+    def __len__(self):
+        return len(self._contexts)
+
+    def __contains__(self, key):
+        for c in self._contexts:
+            if key in c:
+                return True
+        return False
+
+    def pop(self):
+        self._contexts.pop(0)
+
+    def add(self):
+        self._contexts.insert(0, {})
+
+    def update(self, data):
+        self._contexts[-1].update(data)
+
+    def dumps(self):
+        # TODO merge a list of keys
+        return json.dumps(self._contexts, indent=4)
+
+    def __getitem__(self, key):
+        for c in self._contexts:
+            if key in c:
+                return c[key]
+        raise KeyError(f'UndefinedVariable "{key}"')
+
+
 @cli.command()
 def interact():
     """
@@ -183,8 +215,7 @@ def interact():
     session = PromptSession(history=FileHistory('.asyncy/.history'))
     auto_suggest = AutoSuggestFromHistory()
 
-    context = {}  # TODO should be a ContextTree
-    indent = 0
+    context = Context()
     kb = KeyBindings()
 
     @kb.add('s-tab')
@@ -206,11 +237,11 @@ def interact():
     is_variable = re.compile(r'^[a-zA-Z_]\w*$').match
     should_indent = re.compile(r'.* as (\w+(, )?)+$').match
 
-    # TODO track when data was created for context changes
     while 1:
         try:
             # TODO support for indentation
-            user_input = session.prompt(f'{" " * indent * 4}> ',
+            _ = " " * (len(context)-1) * 4
+            user_input = session.prompt(f'{_}> ',
                                         lexer=lexer,
                                         key_bindings=kb,
                                         auto_suggest=auto_suggest)
@@ -226,6 +257,10 @@ def interact():
                         file.write('\n'.join(story) + '\n')
                         sys.exit(0)
 
+                elif user_input == '/locals':
+                    click.echo(context.dumps())
+                    continue
+
                 if is_variable(user_input):
                     if user_input in context:
                         # show variable value
@@ -235,8 +270,7 @@ def interact():
                     continue
 
                 if should_indent(user_input):
-                    # TODO context.push()
-                    indent += 1
+                    context.add()
 
                 try:
                     story.append(user_input)
@@ -253,7 +287,15 @@ def interact():
                     res = requests.post('http://engine.asyncy.net/interact',
                                         data=output)
 
-                click.echo(res.text)
+                data = res.json()
+                if data.get('output'):
+                    click.echo(data['output'])
+
+                elif data.get('error'):
+                    click.echo(click.echo(data['error'], fg='red'))
+
+                if data.get('context'):
+                    context.update(data['context'])
 
         except KeyboardInterrupt:
             pass
