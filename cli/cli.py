@@ -211,6 +211,8 @@ def interact():
     from prompt_toolkit.history import FileHistory
     from prompt_toolkit import PromptSession
     from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+    from prompt_toolkit.styles import Style
+    from prompt_toolkit.formatted_text import HTML
 
     session = PromptSession(history=FileHistory('.asyncy/.history'))
     auto_suggest = AutoSuggestFromHistory()
@@ -228,6 +230,21 @@ def interact():
     # @kb.add('c-d')
     # def _(event):
     #     click.echo(emoji.emojize('\n:sparkles: :shortcake: :sparkles:'))
+    def bottom_toolbar():
+        return [
+            ('class:toolbar-key', ' Shift+Tab'),
+            ('class:toolbar-text', ' will end scope'),
+            ('class:toolbar-key', ' /data'),
+            ('class:toolbar-text', ' will show variables'),
+            ('class:toolbar-key', ' /save /help /exit'),
+        ]
+        return bt
+
+    style = Style.from_dict({
+        'toolbar-text': '#4512ab bg:#aaaaaa',
+        'toolbar-key': '#4512ab bg:#ffffff',
+        'bottom-toolbar': '#4512ab bg:#4512ab',
+    })
 
     # https://python-prompt-toolkit.readthedocs.io/en/latest/
     click.echo(click.style('Λsyncy', fg='magenta') + f' {VERSION} -- ' + click.style('Storyscript', fg='cyan') + f' {storyscript.version}')
@@ -247,6 +264,8 @@ def interact():
             user_input = session.prompt(text,
                                         lexer=lexer,
                                         key_bindings=kb,
+                                        bottom_toolbar=bottom_toolbar,
+                                        style=style,
                                         auto_suggest=auto_suggest)
             if user_input:
                 if user_input == '/exit':
