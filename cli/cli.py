@@ -185,15 +185,18 @@ def interact():
 
     context = {}  # TODO should be a ContextTree
     indent = 0
-    bindings = KeyBindings()
+    kb = KeyBindings()
 
-    @bindings.add('s-tab')
+    @kb.add('s-tab')
     def _(event):
-        # TODO does not work yet
-        click.echo('s tab')
-        if indent > 0:
-            context.shift()
-            indent -= 1
+        if len(context) > 1:
+            context.pop()
+            # TODO take current entry and shift prompt back
+
+    # TODO capture ctr-d events and exit safely
+    # @kb.add('c-d')
+    # def _(event):
+    #     click.echo(emoji.emojize('\n:sparkles: :shortcake: :sparkles:'))
 
     # https://python-prompt-toolkit.readthedocs.io/en/latest/
     click.echo(click.style('Λsyncy', fg='magenta') + f' {VERSION} -- ' + click.style('Storyscript', fg='cyan') + f' {storyscript.version}')
@@ -209,6 +212,7 @@ def interact():
             # TODO support for indentation
             user_input = session.prompt(f'{" " * indent * 4}> ',
                                         lexer=lexer,
+                                        key_bindings=kb,
                                         auto_suggest=auto_suggest)
             if user_input:
                 if user_input == '/exit':
