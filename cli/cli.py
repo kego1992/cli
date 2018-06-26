@@ -272,7 +272,7 @@ def interact():
                 pass
 
             elif user_input == 1:
-                click.echo(emoji.emojize('Bye!'))
+                click.echo(emoji.emojize('Goodbye.'))
                 sys.exit(0)
 
             elif user_input:
