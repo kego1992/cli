@@ -167,34 +167,34 @@ def restart(ctx):
     ctx.invoke(start)
 
 
-class Context:
+class Scope:
     def __init__(self):
-        self._contexts = [{'a':1}]
+        self._levels = [{'a':1}]
 
     def __len__(self):
-        return len(self._contexts)
+        return len(self._levels)
 
     def __contains__(self, key):
-        for c in self._contexts:
+        for c in self._levels:
             if key in c:
                 return True
         return False
 
     def pop(self):
-        self._contexts.pop(0)
+        self._levels.pop(0)
 
     def add(self):
-        self._contexts.insert(0, {})
+        self._levels.insert(0, {})
 
     def update(self, data):
-        self._contexts[-1].update(data)
+        self._levels[-1].update(data)
 
     def dumps(self):
         # TODO merge a list of keys
-        return json.dumps(self._contexts, indent=4)
+        return json.dumps(self._levels, indent=4)
 
     def __getitem__(self, key):
-        for c in self._contexts:
+        for c in self._levels:
             if key in c:
                 return c[key]
         raise KeyError(f'UndefinedVariable "{key}"')
@@ -215,14 +215,14 @@ def interact():
     session = PromptSession(history=FileHistory('.asyncy/.history'))
     auto_suggest = AutoSuggestFromHistory()
 
-    context = Context()
+    scope = Scope()
     kb = KeyBindings()
 
     @kb.add('s-tab')
     def _(event):
-        if len(context) > 1:
-            context.pop()
-            # TODO take current entry and shift prompt back
+        if len(scope) > 1:
+            scope.pop()
+        event.app.exit(0)
 
     # TODO capture ctr-d events and exit safely
     # @kb.add('c-d')
@@ -240,8 +240,11 @@ def interact():
     while 1:
         try:
             # TODO support for indentation
-            _ = " " * (len(context)-1) * 4
-            user_input = session.prompt(f'{_}> ',
+            if len(scope) > 1:
+                text = '...' + (' ' * (len(scope) - 1) * 4)
+            else:
+                text = '>>> '
+            user_input = session.prompt(text,
                                         lexer=lexer,
                                         key_bindings=kb,
                                         auto_suggest=auto_suggest)
@@ -257,20 +260,20 @@ def interact():
                         file.write('\n'.join(story) + '\n')
                         sys.exit(0)
 
-                elif user_input == '/locals':
-                    click.echo(context.dumps())
+                elif user_input == '/data':
+                    click.echo(scope.dumps())
                     continue
 
                 if is_variable(user_input):
-                    if user_input in context:
+                    if user_input in scope:
                         # show variable value
-                        click.echo(context[user_input])
+                        click.echo(scope[user_input])
                     else:
                         click.echo(click.style('UndefinedVariable', fg='red'))
                     continue
 
                 if should_indent(user_input):
-                    context.add()
+                    scope.add()
 
                 try:
                     story.append(user_input)
@@ -295,7 +298,7 @@ def interact():
                     click.echo(click.echo(data['error'], fg='red'))
 
                 if data.get('context'):
-                    context.update(data['context'])
+                    scope.update(data['context'])
 
         except KeyboardInterrupt:
             pass
