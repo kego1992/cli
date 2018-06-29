@@ -199,6 +199,9 @@ class Scope:
                 return c[key]
         raise KeyError(f'UndefinedVariable "{key}"')
 
+    def indent(self):
+        return ' ' * (4 * (len(self) - 1))
+
 
 @cli.command()
 def interact():
@@ -216,6 +219,9 @@ def interact():
 
     session = PromptSession(history=FileHistory('.asyncy/.history'))
     auto_suggest = AutoSuggestFromHistory()
+    from storyscript import compiler, parser
+    Compiler = compiler.Compiler()
+    Parser = parser.Parser()
 
     scope = Scope()
     kb = KeyBindings()
@@ -252,8 +258,11 @@ def interact():
     click.echo(click.style('Type "/" for commands and "ctr+r" for history.', bold=True))
     lexer = PygmentsLexer(PythonLexer)
     story = []
-    is_variable = re.compile(r'^[a-zA-Z_]\w*$').match
-    should_indent = re.compile(r'.* as (\w+(, )?)+$').match
+    block = []
+
+    _should_indent = re.compile(r'.* as (\w+(, )?)+$').match
+    def should_indent(line):
+        return line.startswith(('if ', 'when ', 'else ')) or _should_indent(line)
 
     while 1:
         try:
@@ -268,64 +277,97 @@ def interact():
                                         bottom_toolbar=bottom_toolbar,
                                         style=style,
                                         auto_suggest=auto_suggest)
-            if user_input == 0:
-                pass
-
-            elif user_input == 1:
+            if user_input == 1:
                 click.echo(emoji.emojize('Goodbye.'))
                 sys.exit(0)
 
-            elif user_input:
-                if user_input == '/exit':
-                    sys.exit(0)
+            elif user_input == '':
+                # empty new line
+                continue
 
-                elif user_input == '/save':
-                    to = click.prompt('Path')
-                    if os.path.exists(to):
-                        assert click.confirm('Override')
+            elif user_input == '/exit':
+                sys.exit(0)
+
+            elif user_input == '/save':
+                to = click.prompt('Path')
+                if os.path.exists(to):
+                    assert click.confirm('Override')
                     with open(to, 'w+') as file:
                         file.write('\n'.join(story) + '\n')
                         sys.exit(0)
 
-                elif user_input == '/data':
-                    click.echo(scope.dumps())
-                    continue
+            elif user_input == '/data':
+                click.echo(scope.dumps())
+                continue
 
-                if is_variable(user_input):
-                    if user_input in scope:
-                        # show variable value
-                        click.echo(scope[user_input])
-                    else:
-                        click.echo(click.style('UndefinedVariable', fg='red'))
-                    continue
+            elif user_input == '/story':
+                click.echo('\n'.join(story))
+                continue
+
+            elif user_input == '/block':
+                click.echo('\n'.join(block))
+                continue
+
+            elif user_input in scope:
+                # echo out a value
+                click.echo(scope[user_input])
+                continue
+
+            elif user_input:
 
                 if should_indent(user_input):
-                    scope.add()
+                    try:
+                        # syntax check this line
+                        # TODO output = storyscript.loads(f'{user_input.strip()}\n    pass')
+                        output = compiler.Compiler().compile(Parser.parse(f'{user_input.strip()}\n    a = 1\n'))
+                        # append to story
+                        story.append(f'{scope.indent()}{user_input}')
+                        block.append(f'{scope.indent()}{user_input}')
+                        # enter the scope
+                        scope.add()
 
-                try:
-                    story.append(user_input)
-                    output = storyscript.loads('\n'.join(story))
-                except Exception as e:
-                    click.echo(click.style(str(e), fg='red'))
+                    except Exception as e:
+                        click.echo(click.style(str(e), fg='red'))
+                        raise
+
+                    # back to prompt, cannot commit until block is finished
                     continue
 
+            try:
+                # add block to compiler
+                lines = Compiler.compile(Parser.parse(user_input or '\n'.join(block)))
+                if user_input:
+                    story.append(f'{scope.indent()}{user_input}')
+                    if scope:
+                        block.append(f'{scope.indent()}{user_input}')
+
+                if user_input == 0:
+                    # reset the block
+                    block = []
+
+            except Exception as e:
+                click.echo(click.style(str(e), fg='red'))
+                continue
+
+            with click_spinner.spinner():
                 # TODO assert service exist in Hub
                 #      the hub data should be built locally to quicker requests
 
-                # pass data to engine
-                with click_spinner.spinner():
-                    res = requests.post('http://engine.asyncy.net/interact',
-                                        data=output)
-
+                # send to engine
+                res = requests.post('http://engine.asyncy.net/interact',
+                                    data=lines,
+                                    timeout=10)
+                res.raise_for_status()
                 data = res.json()
-                if data.get('output'):
-                    click.echo(data['output'])
 
-                elif data.get('error'):
-                    click.echo(click.echo(data['error'], fg='red'))
+            if data.get('output'):
+                click.echo(data['output'])
 
-                if data.get('context'):
-                    scope.update(data['context'])
+            elif data.get('error'):
+                click.echo(click.echo(data['error'], fg='red'))
+
+            if data.get('context'):
+                scope.update(data['context'])
 
         except KeyboardInterrupt:
             pass
