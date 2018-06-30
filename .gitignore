@@ -1,6 +1,6 @@
-.asyncy
 *.egg-info
 build
+__pycache__
 dist
 venv
-__pycache__
+.asyncy
