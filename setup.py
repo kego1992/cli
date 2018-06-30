@@ -24,6 +24,7 @@ requirements = [
     'raven==6.9.0',
     'requests==2.19.1',
     'storyscript==0.1.2'
+    'click-didyoumean==0.0.3',
 ]
 
 setup(name='asyncy',

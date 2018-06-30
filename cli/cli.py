@@ -12,7 +12,7 @@ from mixpanel import Mixpanel
 from raven import Client
 import click_spinner
 import emoji
-
+from click_didyoumean import DYMGroup
 
 mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
 # sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
@@ -78,7 +78,7 @@ def run(command):
     )
 
 
-@click.group()
+@click.group(cls=DYMGroup)
 def cli():
     """
     Hello! Welcome to Λsyncy Alpha
