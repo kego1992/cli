@@ -62,7 +62,7 @@ def stream(cmd):
     process = subprocess.Popen(cmd.split(' '), stdout=subprocess.PIPE)
     while True:
         output = process.stdout.readline()
-        if output == '' and process.poll() is not None:
+        if output == b'' and process.poll() is not None:
             break
         if output:
             click.echo(output.strip())
