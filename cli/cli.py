@@ -518,7 +518,8 @@ def version():
     """
     Show version number
     """
-    click.echo(VERSION)
+    click.echo(click.style('Λsyncy', fg='magenta') + f' {VERSION}')
+    click.echo(click.style('Storyscript', fg='cyan') + f' {storyscript.version}')
 
 
 @cli.command()
