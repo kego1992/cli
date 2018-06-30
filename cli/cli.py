@@ -20,7 +20,7 @@ sentry = Client()
 data = None
 dc = 'docker-compose -f .asyncy/docker-compose.yml'
 dc_env = {}
-VERSION = '0.0.6'
+VERSION = '0.0.7'
 
 
 def track(message, extra={}):

@@ -23,12 +23,12 @@ requirements = [
     'Pygments==2.2.0',
     'raven==6.9.0',
     'requests==2.19.1',
-    'storyscript==0.1.2'
     'click-didyoumean==0.0.3',
+    'storyscript==0.1.4'
 ]
 
 setup(name='asyncy',
-      version='0.0.6',
+      version='0.0.7',
       description='Asyncy CLI',
       long_description='',
       classifiers=classifiers,
