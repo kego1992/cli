@@ -365,6 +365,8 @@ def interact():
                 if user_input == 0:
                     # reset the block
                     block = []
+                else:
+                    continue
 
             except Exception as e:
                 click.echo(click.style(str(e), fg='red'))
