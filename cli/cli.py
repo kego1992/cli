@@ -42,11 +42,30 @@ def write(content, location):
         file.write(content)
 
 
-def user():
+def user(exit=True):
     """
     Get the active user
     """
-    return (data or {}).get('user')
+    if (data or {}).get('user'):
+        return True
+    elif exit:
+        click.echo('Please login to Asyncy with ', nl=False)
+        click.echo(click.style('`asyncy login`', fg='magenta'))
+        sys.exit(1)
+    else:
+        return False
+
+
+def running(exit=True):
+    if run('ps -q').out.strip():
+        return True
+
+    if exit:
+        click.echo('Asyncy is not running. Start the stack with ', nl=False)
+        click.echo(click.style('`asyncy start`', fg='magenta'))
+        sys.exit(1)
+    else:
+        return False
 
 
 def init():
@@ -209,6 +228,7 @@ def interact():
     Write Storyscript interactively
     """
     assert user()
+    assert running()
     from pygments.lexers import PythonLexer
     from prompt_toolkit.lexers import PygmentsLexer
     from prompt_toolkit.key_binding import KeyBindings
@@ -383,8 +403,7 @@ def start(ctx):
     assert user()
     track('Start Stack')
 
-    res = run('ps -q')
-    if res.out != '':
+    if running(exit=False):
         click.echo(click.style('Stack is running already.'))
         sys.exit(0)
 
@@ -497,6 +516,7 @@ def logs(follow):
     Show compose logs
     """
     assert user()
+    assert running()
     track('Show Logs')
     if follow:
         stream(f'{dc} logs -f')
@@ -523,13 +543,16 @@ def version():
 
 
 @cli.command()
-def status():
+def ps():
     """
-    Show stack status and health
+    Show stack services and health
     """
     assert user()
-    track('Stack Status')
-    click.echo(run('ps').out)
+    assert running()
+    track('Stack ps')
+    click.echo(click.style('Listing Asyncy containers... ', bold=True), nl=False)
+    with click_spinner.spinner():
+        click.echo(run('ps').out)
 
 
 @cli.command()
