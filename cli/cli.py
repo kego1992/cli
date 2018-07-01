@@ -208,6 +208,7 @@ def interact():
     """
     Write Storyscript interactively
     """
+    assert user()
     from pygments.lexers import PythonLexer
     from prompt_toolkit.lexers import PygmentsLexer
     from prompt_toolkit.key_binding import KeyBindings
