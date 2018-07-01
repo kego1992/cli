@@ -13,12 +13,14 @@ from raven import Client
 import click_spinner
 import emoji
 from click_didyoumean import DYMGroup
+from os.path import expanduser
 
 mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
-# sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
+sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
 sentry = Client()
 data = None
-dc = 'docker-compose -f .asyncy/docker-compose.yml'
+home = expanduser('~/.asyncy')
+dc = f'docker-compose -f {home}/docker-compose.yml'
 dc_env = {}
 VERSION = '0.0.7'
 
@@ -49,8 +51,8 @@ def user():
 
 def init():
     global data
-    if os.path.exists('.asyncy/data.json'):
-        with open('.asyncy/data.json', 'r') as file:
+    if os.path.exists(f'{home}/data.json'):
+        with open(f'{home}/data.json', 'r') as file:
             data = json.load(file)
             sentry.user_context({
                 'id': data['user']['id'],
@@ -104,17 +106,15 @@ def login(ctx, email, password):
         data=json.dumps({'email': email, 'password': password})
     )
     if res.status_code == 200:
-        write(res.text, '.asyncy/data.json')
+        write(res.text, f'{home}/data.json')
         init()
         click.echo(emoji.emojize(f":waving_hand:  Welcome {data['user']['name']}."))
         track('Logged into CLI')
         delegator.run('git init')
         delegator.run('git remote add asyncy http://git.asyncy.net/app')
-        if not os.path.exists('.asyncy/'):
-            os.mkdir('.asyncy/')
-        write('.asyncy', '.gitignore')
-        write('', '.asyncy/.history')
-        delegator.run('git add .gitignore && git commit -m "initial commit"')
+        if not os.path.exists(home):
+            os.mkdir(home)
+        write('', f'{home}/.history')
         click.echo(click.style('√', fg='green') + ' Setup repository.')
         ctx.invoke(update)
         click.echo('')
@@ -145,7 +145,7 @@ def update(ctx):
     click.echo(click.style('   ->', fg='green') + ' docker-compose.yml... ', nl=False)
     with click_spinner.spinner():
         res = requests.get('https://raw.githubusercontent.com/asyncy/stack-compose/master/docker-compose.yml')
-        write(res.text, '.asyncy/docker-compose.yml')
+        write(res.text, f'{home}/docker-compose.yml')
     click.echo('Done')
 
     click.echo(click.style('   ->', fg='green') + ' Pulling new services... ', nl=False)
@@ -217,7 +217,7 @@ def interact():
     from prompt_toolkit.styles import Style
     from prompt_toolkit.formatted_text import HTML
 
-    session = PromptSession(history=FileHistory('.asyncy/.history'))
+    session = PromptSession(history=FileHistory(f'{home}/.history'))
     auto_suggest = AutoSuggestFromHistory()
     from storyscript import compiler, parser
     Compiler = compiler.Compiler()
@@ -434,14 +434,13 @@ def test():
         click.echo(str(e))
     else:
         track('Stories passed')
-        write(stories, '.asyncy/stories.json')
+        write(stories, f'{home}/stories.json')
         stories = json.loads(application)
         if stories['stories'] == {}:
             click.echo(click.style('   X', fg='red') + ' No stories found')
             sys.exit(1)
         else:
             click.echo(click.style('   √', fg='green') + ' Stories built.')
-            click.echo(click.style('   ?', fg='cyan') + ' Data found at .asyncy/stories.json')
 
         # click.echo(click.style('Checking Services', bold=True))
 
