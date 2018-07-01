@@ -148,10 +148,10 @@ def update(ctx):
         write(res.text, f'{home}/docker-compose.yml')
     click.echo('Done')
 
-    click.echo(click.style('   ->', fg='green') + ' Pulling new services... ', nl=False)
-    with click_spinner.spinner():
-        run('pull')
-        run('down')
+    click.echo(click.style('   ->', fg='green') + ' Pulling new services... ')
+    stream(f'{dc} pull')
+    click.echo(click.style('   ->', fg='green') + ' Shutting down stack... ')
+    stream(f'{dc} down')
     click.echo('Done')
 
     ctx.invoke(start)
