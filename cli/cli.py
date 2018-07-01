@@ -22,7 +22,7 @@ data = None
 home = expanduser('~/.asyncy')
 dc = f'docker-compose -f {home}/docker-compose.yml'
 dc_env = {}
-VERSION = '0.0.7'
+VERSION = '0.0.8'
 
 
 def track(message, extra={}):
