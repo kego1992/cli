@@ -281,13 +281,16 @@ def interact():
     story = []
     block = []
 
-    _should_indent = re.compile(r'.* as (\w+(, )?)+$').match
+    _patterns = re.compile(r'((.* as (\w+(, )?)+)|try|catch|finally)$').match
     def should_indent(line):
-        return line.startswith(('if ', 'when ', 'else ')) or _should_indent(line)
+        return (
+            line.startswith(('if ', 'unless ', 'else if ', 'else ',
+                             'when ', 'while ', 'function '))
+            or _patterns(line)
+        )
 
     while 1:
         try:
-            # TODO support for indentation
             if len(scope) > 1:
                 text = '...' + (' ' * (len(scope) - 1) * 4)
             else:
