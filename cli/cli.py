@@ -451,7 +451,7 @@ def test():
     track('Test Stories')
     click.echo(click.style('Compiling Stories', bold=True))
     try:
-        stories = App.compile(os.getcwd())
+        stories = storyscript.loads(os.getcwd())
     except Exception as e:
         track('Stories failed')
         sentry.captureException()
