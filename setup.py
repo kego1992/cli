@@ -16,6 +16,7 @@ classifiers = [
 requirements = [
     'click==6.7',
     'click-spinner==0.1.8',
+    'click-alias==0.1.1a3',
     'delegator.py==0.1.0',
     'emoji==0.5.0',
     'mixpanel==4.3.2',

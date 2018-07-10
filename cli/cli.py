@@ -14,6 +14,7 @@ import click_spinner
 import emoji
 from click_didyoumean import DYMGroup
 from os.path import expanduser
+from click_alias import ClickAliasedGroup
 
 mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
 sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
@@ -99,7 +100,11 @@ def run(command):
     )
 
 
-@click.group(cls=DYMGroup)
+class CLI(DYMGroup, ClickAliasedGroup):
+    pass
+
+
+@click.group(cls=CLI)
 def cli():
     """
     Hello! Welcome to Λsyncy Alpha
@@ -222,7 +227,7 @@ class Scope:
         return ' ' * (4 * (len(self) - 1))
 
 
-@cli.command()
+@cli.command(aliases=['run'])
 def interact():
     """
     Write Storyscript interactively
@@ -427,7 +432,7 @@ def start(ctx):
         ctx.invoke(ls)
 
 
-@cli.command()
+@cli.command(aliases=['list'])
 def ls():
     """
     List services and user interfaces
@@ -514,7 +519,7 @@ def bootstrap(story):
         click.echo('')
 
 
-@cli.command()
+@cli.command(aliases=['log'])
 @click.option('--follow', '-f', is_flag=True, help='Follow the logs')
 def logs(follow):
     """
@@ -547,7 +552,7 @@ def version():
     click.echo(click.style('Storyscript', fg='cyan') + f' {storyscript.version}')
 
 
-@cli.command()
+@cli.command(aliases=['ps'])
 def status():
     """
     Show stack services and health
@@ -560,7 +565,7 @@ def status():
         click.echo(run('ps').out)
 
 
-@cli.command()
+@cli.command(aliases=['stop'])
 def shutdown():
     """
     Show stack status and health
@@ -573,7 +578,7 @@ def shutdown():
     click.echo('Done')
 
 
-@cli.command()
+@cli.command(aliases=['push'])
 @click.option('--force', '-f', is_flag=True, help='Forse push')
 def deploy(force):
     """
@@ -600,7 +605,7 @@ def deploy(force):
     click.echo('Your http endpoints resolve to ' + click.style('http://asyncy.net', fg='cyan'))
 
 
-@cli.command()
+@cli.command(aliases=['debug'])
 @click.option('--pager', '-p', is_flag=True, help='Review payload only')
 @click.option('--message', '-m',
               help='A short or long message about what went wrong.')
