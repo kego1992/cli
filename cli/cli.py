@@ -548,7 +548,7 @@ def version():
 
 
 @cli.command()
-def ps():
+def status():
     """
     Show stack services and health
     """
