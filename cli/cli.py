@@ -37,7 +37,7 @@ def write(content, location):
         os.makedirs(dir)
 
     if isinstance(content, (list, dict)):
-        content = json.dumps(content)
+        content = json.dumps(content, indent=2)
 
     with open(location, 'w+') as file:
         file.write(content)
