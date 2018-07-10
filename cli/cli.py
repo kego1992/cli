@@ -417,19 +417,10 @@ def start(ctx):
         click.echo(click.style('Stack is running already.'))
         sys.exit(0)
 
-    click.echo(click.style('Starting Asyncy... ', bold=True), nl=False)
-    with click_spinner.spinner():
-        res = run('up -d')
-    click.echo('Done')
-
-    if res.return_code != 0:
-        click.echo(res.err)
-        click.echo(click.style('Error starting docker', fg='red'))
-        track('Error starting stack', {'sentry': sentry.captureMessage(res.err)})
-        sys.exit(1)
-    else:
-        click.echo(click.style('   √', fg='green') + ' Stack is up!')
-        ctx.invoke(ls)
+    click.echo(click.style('Starting Asyncy', bold=True))
+    stream(f'{dc} up -d')
+    click.echo(click.style('√', fg='green') + ' Stack is up!')
+    ctx.invoke(ls)
 
 
 @cli.command(aliases=['list'])
@@ -572,9 +563,7 @@ def shutdown():
     """
     assert user()
     track('Stack Shutdown')
-    click.echo(click.style('Shutdown Asyncy... ', bold=True), nl=False)
-    with click_spinner.spinner():
-        run('down')
+    stream(f'{dc} down')
     click.echo('Done')
 
 
