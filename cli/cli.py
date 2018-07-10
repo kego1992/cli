@@ -74,10 +74,23 @@ def init():
     if os.path.exists(f'{home}/data.json'):
         with open(f'{home}/data.json', 'r') as file:
             data = json.load(file)
+            data.setdefault('configuration', {})
             sentry.user_context({
                 'id': data['user']['id'],
                 'email': data['user']['email']
             })
+
+
+def save():
+    click.echo(click.style('Updating application...', bold=True), nl=False)
+    with click_spinner.spinner():
+        # save configuration
+        write(data, f'{home}/data.json')
+        # save environment to engine
+        run(f'''exec engine bash -c "echo '{json.dumps(data['configuration'])}' > /asyncy/config/environment.json"''')
+        # restart engine
+        run(f'restart engine')
+    click.echo('Done.')
 
 
 def stream(cmd):
@@ -532,6 +545,121 @@ def feedback():
     """
     click.echo('Open https://asyncy.click/feedback')
     click.launch('https://asyncy.click/feedback')
+
+
+@cli.command(aliases=['config:set', 'config:get', 'config:del'], hidden=True)
+def config():
+    """
+    Manage environment variables
+
+        $ asyncy config                 # List variables
+
+        $ asyncy config:set key=value   # Set one or more variables
+
+        $ asyncy config:get key         # Get one variable
+
+        $ asyncy config:del key         # Delete one or more variables
+
+    """
+    if data['configuration']:
+        click.echo(click.style('Storyscript variables:', dim=True))
+        for name, value in data['configuration'].items():
+            if not isinstance(value, dict):
+                click.echo(click.style(name, fg='green') + f':  {value}')
+
+        click.echo('')
+        click.echo(click.style('Service variables:', dim=True))
+        for name, value in data['configuration'].items():
+            if isinstance(value, dict):
+                click.echo(click.style(name, bold=True))
+                for name, value in value.items():
+                    click.echo('  ' + click.style(name, fg='green') + f':  {value}')
+
+    else:
+        click.echo(click.style('No configuration set yet.', bold=True))
+        click.echo('    Use ' + click.style('$ ', dim=True) + click.style('asyncy config:set key=value', fg='magenta') + ' to set one or more variables')
+
+
+@cli.command(aliases=['config:set'], hidden=True)
+@click.argument('variables', nargs=-1)
+def config_set(variables):
+    """
+    Set one or more environment variables
+
+        $ asyncy config:set key=value foo=bar
+
+    To set an environment variable to a specific service use
+
+        $ asyncy config:set twitter.oauth_token=value
+
+    """
+    assert user()
+    track('Set variables')
+    if variables:
+        for keyval in variables:
+            if '=' in keyval:
+                key, val = tuple(keyval.split('=', 1))
+                if '.' in key:
+                    parent, key = tuple(key.split('.', 1))
+                    service = data['configuration'].setdefault(parent.lower(), {})
+                    service[key.upper()] = val
+                else:
+                    data['configuration'][key.upper()] = val
+                click.echo(click.style(key.upper(), fg='green') + f':  {val}')
+        save()
+    else:
+        click.echo(config_set.__doc__.strip())
+
+
+@cli.command(aliases=['config:get'], hidden=True)
+@click.argument('variables', nargs=-1)
+def config_get(variables):
+    """
+    Get one or more environment variables
+    """
+    assert user()
+    track('Get variables')
+    if variables:
+        for name in variables:
+            if '.' in name:
+                service, name = tuple(name.split('.', 1))
+                value = data['configuration'][service.lower()].get(name.upper(), None)
+            else:
+                if name in data['configuration']:
+                    # could be a service here
+                    value = data['configuration'][name]
+                else:
+                    value = data['configuration'].get(name.upper(), None)
+
+            if value:
+                if isinstance(value, dict):
+                    for name, value in value.items():
+                        click.echo(click.style(name.upper(), fg='green') + f':  {value}')
+                else:
+                    click.echo(click.style(name.upper(), fg='green') + f':  {value}')
+    else:
+        click.echo(config_get.__doc__.strip())
+
+
+@cli.command(aliases=['config:del', 'config:delete', 'config:rm'], hidden=True)
+@click.argument('variables', nargs=-1)
+def config_del(variables):
+    """
+    Get one or more environment variables
+    """
+    assert user()
+    track('Delete variables')
+    if variables:
+        for name in variables:
+            if name in data['configuration']:
+                # could be a service here
+                data['configuration'].pop(name)
+                click.echo(click.style('Removed service configuration', fg='red') + f': {name}')
+            elif data['configuration'].pop(name.upper(), None):
+                click.echo(click.style('Removed', fg='red') + f': {name.upper()}')
+        save()
+    else:
+        click.echo(config_del.__doc__.strip())
 
 
 @cli.command()
