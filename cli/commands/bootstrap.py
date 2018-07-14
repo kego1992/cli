@@ -4,10 +4,10 @@ import click
 import emoji
 import os
 
-from cli import Cli
+from .. import cli
 
 
-@Cli.Cli.command()
+@cli.Cli.command()
 @click.argument('story', default='-',
                 type=click.Choice(['http', 'every', 'function',
                                    'if', 'loop', 'twitter',
@@ -17,8 +17,8 @@ def bootstrap(story):
     """
     Produce example stories as templates to work from.
     """
-    assert Cli.user()
-    Cli.track('Bootstrap story')
+    assert cli.user()
+    cli.track('Bootstrap story')
     if story != '-':
         with open(os.path.join(os.path.dirname(__file__),
                                f'../stories/{story}.story'), 'r') as file:

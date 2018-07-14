@@ -2,10 +2,10 @@
 
 import click
 
-from cli import Cli
+from .. import cli
 
 
-@Cli.Cli.command()
+@cli.Cli.command()
 def feedback():
     """
     Give feedback

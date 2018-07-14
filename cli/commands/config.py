@@ -2,10 +2,10 @@
 
 import click
 
-from cli import Cli
+from .. import cli
 
 
-@Cli.Cli.command(aliases=['config:set', 'config:get', 'config:del'], hidden=True)
+@cli.Cli.command(aliases=['config:set', 'config:get', 'config:del'], hidden=True)
 def config():
     """
     Manage environment variables
@@ -30,7 +30,7 @@ def config():
         click.echo('    Set service specific variables by calling ' + click.style('$ ', dim=True) + click.style('asyncy config:set service key=value', fg='magenta'))
 
 
-@Cli.Cli.command(aliases=['config:set'], hidden=True)
+@cli.Cli.command(aliases=['config:set'], hidden=True)
 @click.argument('variables', nargs=-1)
 def config_set(variables):
     """
@@ -43,8 +43,8 @@ def config_set(variables):
         $ asyncy config:set twitter oauth_token=value
 
     """
-    assert Cli.user()
-    Cli.track('Set variables')
+    assert cli.user()
+    cli.track('Set variables')
     if variables:
         for keyval in variables:
             if '=' in keyval:
@@ -61,14 +61,14 @@ def config_set(variables):
         click.echo(config_set.__doc__.strip())
 
 
-@Cli.Cli.command(aliases=['config:get'], hidden=True)
+@cli.Cli.command(aliases=['config:get'], hidden=True)
 @click.argument('variables', nargs=-1)
 def config_get(variables):
     """
     Get one or more environment variables
     """
-    assert Cli.user()
-    Cli.track('Get variables')
+    assert cli.user()
+    cli.track('Get variables')
     if variables:
         for name in variables:
             if '.' in name:
@@ -91,14 +91,14 @@ def config_get(variables):
         click.echo(config_get.__doc__.strip())
 
 
-@Cli.Cli.command(aliases=['config:del', 'config:delete', 'config:rm'], hidden=True)
+@cli.Cli.command(aliases=['config:del', 'config:delete', 'config:rm'], hidden=True)
 @click.argument('variables', nargs=-1)
 def config_del(variables):
     """
     Get one or more environment variables
     """
-    assert Cli.user()
-    Cli.track('Delete variables')
+    assert cli.user()
+    cli.track('Delete variables')
     if variables:
         for name in variables:
             if name in Cli.data['configuration']:

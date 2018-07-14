@@ -2,14 +2,14 @@
 
 import click
 
-from cli import Cli
+from .. import cli
 
 
-@Cli.Cli.command()
+@cli.Cli.command()
 def shutdown():
     """
     Shutdown Asyncy services
     """
-    assert Cli.user()
-    Cli.track('Stack Shutdown')
+    assert cli.user()
+    cli.track('Stack Shutdown')
     Cli.stream(f'{dc} down')

@@ -6,27 +6,27 @@ import emoji
 import json
 import sys
 
-from cli import Cli
+from .. import cli
 
 
-@Cli.Cli.command()
+@cli.Cli.command()
 def test():
     """
     Test the Stories
     """
-    assert Cli.user()
-    Cli.track('Test Stories')
+    assert cli.user()
+    cli.track('Test Stories')
     click.echo(click.style('Compiling Stories', bold=True))
     try:
         stories = storyscript.loads(os.getcwd())
     except Exception as e:
-        Cli.track('Stories failed')
+        cli.track('Stories failed')
         sentry.captureException()
         click.echo(click.style('X', fg='red') + ' Errors found in Storyscript.')
         click.echo(str(e))
     else:
-        Cli.track('Stories passed')
-        Cli.write(stories, f'{Cli.home}/stories.json')
+        cli.track('Stories passed')
+        Cli.write(stories, f'{cli.home}/stories.json')
         stories = json.loads(application)
         if stories['stories'] == {}:
             click.echo(click.style('   X', fg='red') + ' No stories found')

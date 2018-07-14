@@ -45,5 +45,5 @@ setup(name='asyncy',
       install_requires=requirements,
       extras_require={ },
       entry_points={
-          'console_scripts': ['asyncy=cli.cli:cli']
+          'console_scripts': ['asyncy=cli.main:Cli']
       })

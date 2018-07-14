@@ -3,15 +3,15 @@
 
 import click
 
-from cli import Cli
+from .. import cli
 
 
-@Cli.Cli.command()
+@cli.Cli.command()
 def list():
     """
     List services and user interfaces
     """
-    Cli.track('List Services')
+    cli.track('List Services')
     click.echo(click.style('Services', bold=True))
     click.echo('    Your App --      ' + click.style('http://asyncy.net', fg='cyan'))
     click.echo('    Metrics --       ' + click.style('http://grafana.asyncy.net', fg='cyan') + ' login: admin@admin')

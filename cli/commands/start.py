@@ -3,20 +3,20 @@
 import click
 import sys
 
-from cli import Cli
+from .. import cli
 from .list import list
 
 
-@Cli.Cli.command()
+@cli.Cli.command()
 @click.pass_context
 def start(ctx):
     """
     Start the Asyncy Stack
     """
-    assert Cli.user()
-    Cli.track('Start Stack')
+    assert cli.user()
+    cli.track('Start Stack')
 
-    if Cli.running(exit=False):
+    if cli.running(exit=False):
         click.echo(click.style('Stack is running already.'))
         sys.exit(0)
 

@@ -3,10 +3,10 @@
 import click
 import storyscript
 
-from cli import Cli
+from .. import cli
 
 
-@Cli.Cli.command()
+@cli.Cli.command()
 def version():
     """
     Show version number

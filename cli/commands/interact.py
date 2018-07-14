@@ -18,7 +18,7 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.styles import Style
 from prompt_toolkit.formatted_text import HTML
 
-from cli import Cli
+from .. import cli
 
 
 class Scope:
@@ -59,7 +59,7 @@ class Scope:
 
 welcome = (
     click.style('Λsyncy', fg='magenta') + ' ' +
-    click.style(Cli.VERSION, dim=True) + ' // ' +
+    click.style(cli.VERSION, dim=True) + ' // ' +
     click.style('Storyscript', fg='cyan') + ' ' +
     click.style(storyscript.version, dim=True)
 )
@@ -81,15 +81,15 @@ def save(filepath, story):
         file.write('\n'.join(story) + '\n')
 
 
-@Cli.Cli.command()
+@cli.Cli.command()
 def interact():
     """
     Write Storyscript interactively
     """
-    assert Cli.user()
-    assert Cli.running()
+    assert cli.user()
+    assert cli.running()
 
-    session = PromptSession(history=FileHistory(f'{Cli.home}/.history'))
+    session = PromptSession(history=FileHistory(f'{cli.home}/.history'))
     auto_suggest = AutoSuggestFromHistory()
     Compiler = compiler.Compiler()
     Parser = parser.Parser()

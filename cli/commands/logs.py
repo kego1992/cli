@@ -2,18 +2,18 @@
 
 import click
 
-from cli import Cli
+from .. import cli
 
 
-@Cli.Cli.command()
+@cli.Cli.command()
 @click.option('--follow', '-f', is_flag=True, help='Follow the logs')
 def logs(follow):
     """
     Show compose logs
     """
-    assert Cli.user()
-    assert Cli.running()
-    Cli.track('Show Logs')
+    assert cli.user()
+    assert cli.running()
+    cli.track('Show Logs')
     if follow:
         Cli.stream(f'{Cli.dc} logs -f')
     else:

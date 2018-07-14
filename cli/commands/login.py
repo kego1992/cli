@@ -8,11 +8,11 @@ import emoji
 import json
 import sys
 
-from cli import Cli
+from .. import cli
 from .update import update
 
 
-@Cli.Cli.command()
+@cli.Cli.command()
 @click.option('--email', help='Your email address',
               prompt=True)
 @click.option('--password', help='Password',
@@ -27,15 +27,15 @@ def login(ctx, email, password):
         data=json.dumps({'email': email, 'password': password})
     )
     if res.status_code == 200:
-        Cli.write(res.text, f'{Cli.home}/data.json')
+        Cli.write(res.text, f'{cli.home}/data.json')
         Cli.init()
         click.echo(emoji.emojize(f":waving_hand:  Welcome {Cli.data['user']['name']}."))
-        Cli.track('Logged into CLI')
+        cli.track('Logged into CLI')
         delegator.run('git init')
         delegator.run('git remote add asyncy http://git.asyncy.net/app')
-        if not os.path.exists(Cli.home):
-            os.mkdir(Cli.home)
-        Cli.write('', f'{Cli.home}/.history')
+        if not os.path.exists(cli.home):
+            os.mkdir(cli.home)
+        Cli.write('', f'{cli.home}/.history')
         click.echo(click.style('√', fg='green') + ' Setup repository.')
         ctx.invoke(update)
         click.echo('')

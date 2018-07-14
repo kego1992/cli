@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .Cli import Cli
+from .cli import Cli
 from . import commands
 
 

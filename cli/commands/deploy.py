@@ -5,10 +5,10 @@ import sys
 import emoji
 import delegator
 
-from cli import Cli
+from .. import cli
 
 
-@Cli.Cli.command()
+@cli.Cli.command()
 @click.option('--force', '-f', is_flag=True, help='Forse push')
 def deploy(force):
     """
@@ -16,12 +16,12 @@ def deploy(force):
 
         git push asyncy master
     """
-    assert Cli.user()
-    Cli.track('Deploy App')
+    assert cli.user()
+    cli.track('Deploy App')
     if not force:
         res = delegator.run('git status -s')
         if res.out != '':
-            Cli.track('Unstagged changes')
+            cli.track('Unstagged changes')
             click.echo(click.style('There are unstagged changes.', fg='red'))
             click.echo('The following files need to be commited before deploying your app.')
             click.echo(res.out.replace('?', '--'))

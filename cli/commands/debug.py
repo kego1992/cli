@@ -9,10 +9,10 @@ from pygments import highlight
 from pygments.lexers import JsonLexer
 from pygments.formatters import TerminalFormatter
 
-from cli import Cli
+from .. import cli
 
 
-@Cli.Cli.command()
+@cli.Cli.command()
 @click.option('--pager', '-p', is_flag=True, help='Review payload only')
 @click.option('--message', '-m',
               help='A short or long message about what went wrong.')
@@ -20,8 +20,8 @@ def debug(pager, message):
     """
     Upload a support bundle
     """
-    assert Cli.user()
-    Cli.track('Support Bundle')
+    assert cli.user()
+    cli.track('Support Bundle')
 
     if not pager and not message:
         click.echo(click.style('About to send a support bundle to our team for analysis.', dim=True))
