@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from .cli import Cli
+from .cli import cli
 from .commands import *
 
 
 if __name__ == '__main__':
-    Cli()
+    cli()

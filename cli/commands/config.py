@@ -5,7 +5,7 @@ import click
 from .. import cli
 
 
-@cli.Cli.command(aliases=['config:set', 'config:get', 'config:del'],
+@cli.cli.command(aliases=['config:set', 'config:get', 'config:del'],
                  hidden=True)
 def config():
     """
@@ -37,7 +37,7 @@ def config():
                                fg='magenta'))
 
 
-@cli.Cli.command(aliases=['config:set'], hidden=True)
+@cli.cli.command(aliases=['config:set'], hidden=True)
 @click.argument('variables', nargs=-1)
 def config_set(variables):
     """
@@ -69,7 +69,7 @@ def config_set(variables):
         click.echo(config_set.__doc__.strip())
 
 
-@cli.Cli.command(aliases=['config:get'], hidden=True)
+@cli.cli.command(aliases=['config:get'], hidden=True)
 @click.argument('variables', nargs=-1)
 def config_get(variables):
     """
@@ -102,7 +102,7 @@ def config_get(variables):
         click.echo(config_get.__doc__.strip())
 
 
-@cli.Cli.command(aliases=['config:del', 'config:delete', 'config:rm'],
+@cli.cli.command(aliases=['config:del', 'config:delete', 'config:rm'],
                  hidden=True)
 @click.argument('variables', nargs=-1)
 def config_del(variables):

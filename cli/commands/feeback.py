@@ -5,7 +5,7 @@ import click
 from .. import cli
 
 
-@cli.Cli.command()
+@cli.cli.command()
 def feedback():
     """
     Give feedback

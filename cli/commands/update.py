@@ -8,7 +8,7 @@ from .start import start
 from .. import cli
 
 
-@cli.Cli.command()
+@cli.cli.command()
 @click.pass_context
 def update(ctx):
     """

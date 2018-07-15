@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import click
-
 from .. import cli
 
 
-@cli.Cli.command()
+@cli.cli.command()
 def shutdown():
     """
     Shutdown Asyncy services

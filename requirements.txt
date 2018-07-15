@@ -1,5 +1,6 @@
 click-alias==0.1.1a3
 click-didyoumean==0.0.3
+click-help-colors==0.4
 click-spinner==0.1.8
 click==6.7
 delegator.py==0.1.0

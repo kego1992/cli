@@ -3,7 +3,7 @@
 from setuptools import find_packages, setup
 from setuptools.command.install import install
 
-from cli.cli import VERSION
+from cli.version import version
 
 
 classifiers = [
@@ -32,6 +32,7 @@ keywords = [
 requirements = [
     'click-alias==0.1.1a3',
     'click-didyoumean==0.0.3',
+    'click-help-colors==0.4',
     'click-spinner==0.1.8',
     'click==6.7',
     'delegator.py==0.1.0',
@@ -46,7 +47,7 @@ requirements = [
 
 
 setup(name='asyncy',
-      version=VERSION,
+      version=version,
       description='Asyncy CLI',
       long_description='',
       classifiers=classifiers,

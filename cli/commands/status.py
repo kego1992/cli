@@ -6,7 +6,7 @@ import click_spinner
 from .. import cli
 
 
-@cli.Cli.command()
+@cli.cli.command()
 def status():
     """
     Show stack services and health

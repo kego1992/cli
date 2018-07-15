@@ -2,12 +2,12 @@
 
 import click
 
-from .. import cli
 from .shutdown import shutdown
 from .start import start
+from .. import cli
 
 
-@cli.Cli.command()
+@cli.cli.command()
 @click.pass_context
 def restart(ctx):
     """

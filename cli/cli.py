@@ -1,34 +1,43 @@
 # -*- coding: utf-8 -*-
 
-from click_alias import ClickAliasedGroup
-from click_didyoumean import DYMGroup
-from mixpanel import Mixpanel
-from raven import Client
-import click
-import click_spinner
-import delegator
-
 import json
 import os
 import subprocess
 import sys
 
+import click
+from click.termui import _ansi_colors, _ansi_reset_all
+from click_alias import ClickAliasedGroup
+from click_didyoumean import DYMGroup
+import click_help_colors
+import click_spinner
+import delegator
+from mixpanel import Mixpanel
+from raven import Client
 
-mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
-sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
+from .version import version
+
+
+if not os.getenv('TOXENV'):
+    mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
+    sentry = Client(
+        'https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504'
+    )
+else:
+    mp = None
+    sentry = Client()
 
 data = None
 home = os.path.expanduser('~/.asyncy')
 dc = f'docker-compose -f {home}/docker-compose.yml'
 dc_env = {}
-VERSION = '0.0.7'
 
 
 def track(message, extra={}):
     try:
-        extra['version'] = VERSION
+        extra['version'] = version
         mp.track(str(data['user']['id']), message, extra)
-    except:
+    except Exception:
         # ignore issues with tracking
         pass
 
@@ -117,17 +126,33 @@ def run(command):
     )
 
 
-class _cli(DYMGroup, ClickAliasedGroup):
+def _colorize(text, color=None):
+    # PATCH for https://github.com/r-m-n/click-help-colors/pull/3
+    if not color:
+        return text
+    try:
+        return '\033[%dm' % (_ansi_colors[color]) + text + _ansi_reset_all
+    except ValueError:
+        raise TypeError('Unknown color %r' % color)
+
+
+click_help_colors._colorize = _colorize
+
+
+class Cli(DYMGroup, ClickAliasedGroup,
+          click_help_colors.HelpColorsGroup):
     pass
 
 
-@click.group(cls=_cli)
-def Cli():
+@click.group(cls=Cli,
+             help_headers_color='bright_black',
+             help_options_color='bright_magenta')
+def cli():
     """
     Hello! Welcome to Λsyncy Alpha
 
     We hope you enjoy and we look forward to your feedback.
 
-    Docs: https://docs.asyncy.com/cli
+    Documentation: https://docs.asyncy.com
     """
     init()

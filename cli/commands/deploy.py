@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import click
 import sys
-import emoji
+
+import click
 import delegator
+import emoji
 
 from .. import cli
 
 
-@cli.Cli.command()
+@cli.cli.command()
 @click.option('--force', '-f', is_flag=True, help='Forse push')
 def deploy(force):
     """

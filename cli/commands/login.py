@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 
+import json
+import os
+import sys
+
 import click
 import delegator
 import emoji
-import json
-import os
 import requests
-import sys
 
-from .. import cli
 from .update import update
+from .. import cli
 
 
-@cli.Cli.command()
+@cli.cli.command()
 @click.option('--email', help='Your email address',
               prompt=True)
 @click.option('--password', help='Password',

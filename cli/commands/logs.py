@@ -5,7 +5,7 @@ import click
 from .. import cli
 
 
-@cli.Cli.command()
+@cli.cli.command()
 @click.option('--follow', '-f', is_flag=True, help='Follow the logs')
 def logs(follow):
     """

@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import click
 import sys
 
-from .. import cli
+import click
+
 from .list import list
+from .. import cli
 
 
-@cli.Cli.command()
+@cli.cli.command()
 @click.pass_context
 def start(ctx):
     """

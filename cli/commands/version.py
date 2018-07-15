@@ -7,14 +7,14 @@ import storyscript
 from .. import cli
 
 
-@cli.Cli.command()
+@cli.cli.command()
 def version():
     """
     Show version number
     """
     click.echo(
         click.style('Λsyncy', fg='magenta') + ' ' +
-        click.style(cli.VERSION, dim=True) + ' // ' +
+        cli.version + click.style(' - ', dim=True) +
         click.style('Storyscript', fg='cyan') + ' ' +
-        click.style(storyscript.version, dim=True)
+        storyscript.version
     )

@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 
+import json
+import os
+import re
+import sys
+
 import click
 import click_spinner
-import re
 import emoji
-import os
-import json
-import storyscript
-from storyscript import compiler, parser
-import requests
-import sys
-from pygments.lexers import PythonLexer
-from prompt_toolkit.lexers import PygmentsLexer
-from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.history import FileHistory
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.history import FileHistory
+from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.lexers import PygmentsLexer
 from prompt_toolkit.styles import Style
-from prompt_toolkit.formatted_text import HTML
+from pygments.lexers import PythonLexer
+import requests
+import storyscript
+from storyscript import compiler, parser
 
 from .. import cli
 
@@ -246,7 +246,7 @@ class Repl:
         """
         try:
             os.makedirs(os.path.basename(filepath))
-        except:
+        except Exception:
             pass
 
         if os.path.exists(filepath):
@@ -256,7 +256,7 @@ class Repl:
             file.write('\n'.join(self.story) + '\n')
 
 
-@cli.Cli.command()
+@cli.cli.command()
 def interact():
     """
     Write Storyscript interactively
@@ -266,9 +266,9 @@ def interact():
 
     click.echo(
         click.style('Λsyncy', fg='magenta') + ' ' +
-        click.style(cli.VERSION, dim=True) + ' // ' +
+        cli.version + click.style(' - ', dim=True) +
         click.style('Storyscript', fg='cyan') + ' ' +
-        click.style(storyscript.version, dim=True)
+        storyscript.version
     )
 
     try:

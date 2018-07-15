@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import click
-import storyscript
-import emoji
-import json
-import sys
 import os
+import sys
+
+import click
+import emoji
+import storyscript
 
 from .. import cli
 
 
-@cli.Cli.command()
+@cli.cli.command()
 def test():
     """
     Test the Stories

@@ -6,7 +6,7 @@ import click
 from .. import cli
 
 
-@cli.Cli.command()
+@cli.cli.command()
 def list():
     """
     List services and user interfaces

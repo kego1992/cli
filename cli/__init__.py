@@ -1,3 +1,4 @@
 # -*- coding: utf-8 -*-
+from .version import version
 
-from . import cli
+__version__ = VERSION = version

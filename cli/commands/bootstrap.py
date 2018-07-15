@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 import click
 import emoji
-import os
 
 from .. import cli
 
 
-@cli.Cli.command()
+@cli.cli.command()
 @click.argument('story', default='-',
                 type=click.Choice(['http', 'every', 'function',
                                    'if', 'loop', 'twitter',

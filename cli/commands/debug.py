@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 
+import json
+from glob import glob
+
 import click
 import click_spinner
 import delegator
-import json
-from glob import glob
 from pygments import highlight
-from pygments.lexers import JsonLexer
 from pygments.formatters import TerminalFormatter
+from pygments.lexers import JsonLexer
 
 from .. import cli
 
 
-@cli.Cli.command()
+@cli.cli.command()
 @click.option('--pager', '-p', is_flag=True, help='Review payload only')
 @click.option('--message', '-m',
               help='A short or long message about what went wrong.')
@@ -39,7 +40,7 @@ def debug(pager, message):
                     path,
                     json.loads(cli.run(f'exec -T bootstrap cat {path}').out)
                 )
-            except:
+            except Exception:
                 return (path, None)
 
         def read(path):
@@ -50,7 +51,7 @@ def debug(pager, message):
             try:
                 data = json.loads(delegator.run(f'docker inspect {id}').out)[0]
                 return data['Name'], data
-            except:
+            except Exception:
                 return id, None
 
         bundle = {
