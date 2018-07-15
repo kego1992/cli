@@ -15,6 +15,6 @@ def logs(follow):
     assert cli.running()
     cli.track('Show Logs')
     if follow:
-        Cli.stream(f'{Cli.dc} logs -f')
+        cli.stream(f'{cli.dc} logs -f')
     else:
-        click.echo(Cli.run('logs').out)
+        click.echo(cli.run('logs').out)

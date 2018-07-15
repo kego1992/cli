@@ -14,6 +14,7 @@ def status():
     assert cli.user()
     assert cli.running()
     cli.track('Stack ps')
-    click.echo(click.style('Listing Asyncy containers... ', bold=True), nl=False)
+    click.echo(click.style('Listing Asyncy containers... ', bold=True),
+               nl=False)
     with click_spinner.spinner():
-        click.echo(Cli.run('ps').out)
+        click.echo(cli.run('ps').out)

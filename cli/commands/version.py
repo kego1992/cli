@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import click
+
 import storyscript
 
 from .. import cli
@@ -13,7 +14,7 @@ def version():
     """
     click.echo(
         click.style('Λsyncy', fg='magenta') + ' ' +
-        click.style(Cli.VERSION, dim=True) + ' // ' +
+        click.style(cli.VERSION, dim=True) + ' // ' +
         click.style('Storyscript', fg='cyan') + ' ' +
         click.style(storyscript.version, dim=True)
     )

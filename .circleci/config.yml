@@ -1,0 +1,39 @@
+version: 2.0
+jobs:
+    build:
+        working_directory: ~/repo
+        docker:
+            - image: circleci/python:3.6.1
+        steps:
+            - checkout
+            - restore_cache:
+                keys:
+                    - v1-dependencies-{{ checksum "setup.py" }}
+                    - v1-dependencies-
+
+            - run:
+                name: install dependencies
+                command: |
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    python3 setup.py install
+                    pip install tox
+
+            - save_cache:
+                paths:
+                    - ./venv
+                key: v1-dependencies-{{ checksum "setup.py" }}
+
+            - run:
+                command: |
+                    . venv/bin/activate
+                    tox
+
+            - run:
+                name: collect coverage
+                command: |
+                    bash <(curl -s https://codecov.io/bash)
+
+            - store_artifacts:
+                path: test-reports
+                destination: test-reports

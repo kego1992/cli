@@ -21,6 +21,6 @@ def start(ctx):
         sys.exit(0)
 
     click.echo(click.style('Starting Asyncy', bold=True))
-    Cli.stream(f'{Cli.dc} up -d')
+    cli.stream(f'{cli.dc} up -d')
     click.echo(click.style('√', fg='green') + ' Stack is up!')
     ctx.invoke(list)

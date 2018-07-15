@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .cli import Cli
-from . import commands
+from .commands import *
 
 
 if __name__ == '__main__':

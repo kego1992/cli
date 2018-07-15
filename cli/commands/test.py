@@ -5,6 +5,7 @@ import storyscript
 import emoji
 import json
 import sys
+import os
 
 from .. import cli
 
@@ -21,13 +22,13 @@ def test():
         stories = storyscript.loads(os.getcwd())
     except Exception as e:
         cli.track('Stories failed')
-        sentry.captureException()
-        click.echo(click.style('X', fg='red') + ' Errors found in Storyscript.')
+        cli.sentry.captureException()
+        click.echo(click.style('X', fg='red') +
+                   ' Errors found in Storyscript.')
         click.echo(str(e))
     else:
         cli.track('Stories passed')
-        Cli.write(stories, f'{cli.home}/stories.json')
-        stories = json.loads(application)
+        cli.write(stories, f'{cli.home}/stories.json')
         if stories['stories'] == {}:
             click.echo(click.style('   X', fg='red') + ' No stories found')
             sys.exit(1)
@@ -36,4 +37,5 @@ def test():
 
         # click.echo(click.style('Checking Services', bold=True))
 
-        click.echo(click.style('√', fg='green') + emoji.emojize(' Looking good! :thumbs_up:'))
+        click.echo(click.style('√', fg='green') +
+                   emoji.emojize(' Looking good! :thumbs_up:'))

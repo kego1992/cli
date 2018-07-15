@@ -1,24 +1,27 @@
-import os
-import sys
-import json
-import click
-import delegator
-import subprocess
+# -*- coding: utf-8 -*-
+
+from click_alias import ClickAliasedGroup
+from click_didyoumean import DYMGroup
 from mixpanel import Mixpanel
 from raven import Client
+import click
 import click_spinner
-from click_didyoumean import DYMGroup
-from click_alias import ClickAliasedGroup
+import delegator
 
-# mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
-# sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
-sentry = Client()
+import json
+import os
+import subprocess
+import sys
+
+
+mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
+sentry = Client('https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504')
 
 data = None
 home = os.path.expanduser('~/.asyncy')
 dc = f'docker-compose -f {home}/docker-compose.yml'
 dc_env = {}
-VERSION = '0.0.9'
+VERSION = '0.0.7'
 
 
 def track(message, extra={}):
@@ -86,7 +89,9 @@ def save():
         # save configuration
         write(data, f'{home}/data.json')
         # save environment to engine
-        run(f'''exec engine bash -c "echo '{json.dumps(data['configuration'])}' > /asyncy/config/environment.json"''')
+        run('exec engine bash -c'
+            f'"echo \'{json.dumps(data["configuration"])}\''
+            '> /asyncy/config/environment.json"')
         # restart engine
         run(f'restart engine')
     click.echo('Done.')

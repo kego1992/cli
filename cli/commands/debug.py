@@ -24,8 +24,10 @@ def debug(pager, message):
     cli.track('Support Bundle')
 
     if not pager and not message:
-        click.echo(click.style('About to send a support bundle to our team for analysis.', dim=True))
-        click.echo(click.style('Tell us a little about what happened.', bold=True))
+        click.echo(click.style('About to send a support bundle '
+                               'to our team for analysis.', dim=True))
+        click.echo(click.style('Tell us a little about what happened.',
+                               bold=True))
         message = click.prompt('Message')
 
     click.echo(click.style('Building support bundle... ', bold=True), nl=False)
@@ -33,9 +35,12 @@ def debug(pager, message):
 
         def file(path):
             try:
-                return path, json.loads(Cli.run(f'exec -T bootstrap cat {path}').out)
+                return (
+                    path,
+                    json.loads(cli.run(f'exec -T bootstrap cat {path}').out)
+                )
             except:
-                return path, None
+                return (path, None)
 
         def read(path):
             with open(path, 'r') as file:
@@ -51,15 +56,19 @@ def debug(pager, message):
         bundle = {
             'message': message,
             'files': {
-                'volume': dict(map(file, ('/asyncy/config/stories.json', '/asyncy/config/services.json', '/asyncy/config/environment.json'))),
-                'stories': dict(map(read, (glob('*.story') + glob('**/*.story'))))
+                'volume': dict(map(file, ('/asyncy/config/stories.json',
+                                          '/asyncy/config/services.json',
+                                          '/asyncy/config/environment.json'))),
+                'stories': dict(map(read,
+                                    (glob('*.story') + glob('**/*.story'))))
             },
-            'logs': Cli.run('logs').out.split('\n'),
+            'logs': cli.run('logs').out.split('\n'),
             'versions': {
                 'docker': delegator.run('docker version').out.split('\n'),
-                'compose': Cli.run('version').out.split('\n')
+                'compose': cli.run('version').out.split('\n')
             },
-            'containers': dict(map(container, Cli.run('ps -q').out.split('\n')))
+            'containers': dict(map(container,
+                                   cli.run('ps -q').out.split('\n')))
         }
 
     click.echo('Done')
@@ -75,7 +84,9 @@ def debug(pager, message):
         )
 
     else:
-        click.echo(click.style('Uploading support bundle... ', bold=True), nl=False)
+        click.echo(click.style('Uploading support bundle... ', bold=True),
+                   nl=False)
         with click_spinner.spinner():
-            sentry.captureMessage(f'Support Bundle: {message[:20]}', extra=bundle)
+            cli.sentry.captureMessage(f'Support Bundle: {message[:20]}',
+                                      extra=bundle)
         click.echo('Done')

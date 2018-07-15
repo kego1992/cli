@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import os
 import click
-import requests
 import delegator
 import emoji
 import json
+import os
+import requests
 import sys
 
 from .. import cli
@@ -27,24 +27,28 @@ def login(ctx, email, password):
         data=json.dumps({'email': email, 'password': password})
     )
     if res.status_code == 200:
-        Cli.write(res.text, f'{cli.home}/data.json')
-        Cli.init()
-        click.echo(emoji.emojize(f":waving_hand:  Welcome {Cli.data['user']['name']}."))
+        cli.write(res.text, f'{cli.home}/data.json')
+        cli.init()
+        click.echo(emoji.emojize(':waving_hand:') +
+                   f'  Welcome {cli.data["user"]["name"]}.')
         cli.track('Logged into CLI')
         delegator.run('git init')
         delegator.run('git remote add asyncy http://git.asyncy.net/app')
         if not os.path.exists(cli.home):
             os.mkdir(cli.home)
-        Cli.write('', f'{cli.home}/.history')
+        cli.write('', f'{cli.home}/.history')
         click.echo(click.style('√', fg='green') + ' Setup repository.')
         ctx.invoke(update)
         click.echo('')
         click.echo('Success! ' + emoji.emojize(':party_popper:'))
         click.echo(click.style('Time to write your Story!', bold=True))
         click.echo('')
-        click.echo('Opening ' + click.style('https://docs.asyncy.com/quick-start/#your-first-story', fg='cyan'))
+        click.echo('Opening ' +
+                   click.style('https://docs.asyncy.com'
+                               '/quick-start/#your-first-story', fg='cyan'))
         click.launch('https://docs.asyncy.com/quick-start/#your-first-story')
 
     else:
-        click.echo('Please signup at ' + click.style('https://asyncy.com', fg='cyan'))
+        click.echo('Please signup at ' +
+                   click.style('https://asyncy.com', fg='cyan'))
         sys.exit(1)

@@ -12,4 +12,4 @@ def shutdown():
     """
     assert cli.user()
     cli.track('Stack Shutdown')
-    Cli.stream(f'{dc} down')
+    cli.stream(f'{cli.dc} down')

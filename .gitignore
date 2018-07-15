@@ -1,6 +1,11 @@
+__pycache__
+.asyncy
+.tox
+.coverage
+coverage.xml
 *.egg-info
 build
-__pycache__
 dist
 venv
-.asyncy
+.idea
+.pytest_cache/
