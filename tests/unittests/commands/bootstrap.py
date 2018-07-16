@@ -12,6 +12,7 @@ def runner():
     return CliRunner()
 
 
-def test_story(mocker, runner):
+def test_choose_template(runner):
     res = runner.invoke(cli, ['bootstrap'])
     assert res.exit_code == 0
+    assert 'Choose a template' in res.output

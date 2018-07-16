@@ -9,3 +9,5 @@ dist
 venv
 .idea
 .pytest_cache/
+*.pyc
+htmlcov

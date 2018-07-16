@@ -6,7 +6,6 @@ import subprocess
 import sys
 
 import click
-from click.termui import _ansi_colors, _ansi_reset_all
 from click_alias import ClickAliasedGroup
 from click_didyoumean import DYMGroup
 import click_help_colors
@@ -126,17 +125,18 @@ def run(command):
     )
 
 
-def _colorize(text, color=None):
-    # PATCH for https://github.com/r-m-n/click-help-colors/pull/3
-    if not color:
-        return text
-    try:
-        return '\033[%dm' % (_ansi_colors[color]) + text + _ansi_reset_all
-    except ValueError:
-        raise TypeError('Unknown color %r' % color)
-
-
-click_help_colors._colorize = _colorize
+# def _colorize(text, color=None):
+#     # PATCH for https://github.com/r-m-n/click-help-colors/pull/3
+#     from click.termui import _ansi_colors, _ansi_reset_all
+#     if not color:
+#         return text
+#     try:
+#         return '\033[%dm' % (_ansi_colors[color]) + text + _ansi_reset_all
+#     except ValueError:
+#         raise TypeError('Unknown color %r' % color)
+#
+#
+# click_help_colors._colorize = _colorize
 
 
 class Cli(DYMGroup, ClickAliasedGroup,
@@ -145,8 +145,8 @@ class Cli(DYMGroup, ClickAliasedGroup,
 
 
 @click.group(cls=Cli,
-             help_headers_color='bright_black',
-             help_options_color='bright_magenta')
+             help_headers_color='yellow',
+             help_options_color='magenta')
 def cli():
     """
     Hello! Welcome to Λsyncy Alpha

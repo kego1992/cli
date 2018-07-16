@@ -20,7 +20,6 @@ classifiers = [
 
 keywords = [
     'asyncy',
-    'choreography',
     'devops',
     'devtools',
     'microservices',
@@ -30,7 +29,7 @@ keywords = [
 ]
 
 requirements = [
-    'click-alias==0.1.1a3',
+    'click-alias==0.1.1a1',
     'click-didyoumean==0.0.3',
     'click-help-colors==0.4',
     'click-spinner==0.1.8',
@@ -42,7 +41,7 @@ requirements = [
     'Pygments==2.2.0',
     'raven==6.9.0',
     'requests==2.19.1',
-    'storyscript==0.1.6',
+    'storyscript>=0.2.0',
 ]
 
 
@@ -63,5 +62,5 @@ setup(name='asyncy',
       install_requires=requirements,
       extras_require={},
       entry_points={
-          'console_scripts': ['asyncy=cli.main:Cli']
+          'console_scripts': ['asyncy=cli.main:cli']
       })
