@@ -18,7 +18,6 @@ def bootstrap(story):
     """
     Produce example stories as templates to work from.
     """
-    assert cli.user()
     cli.track('Bootstrap story')
     if story != '-':
         with open(os.path.join(os.path.dirname(__file__),
