@@ -1,9 +1,9 @@
 # Asyncy CI
 
-![Requires.io](https://img.shields.io/requires/github/asyncy/cli.svg?style=flat-square)
-![CircleCI](https://img.shields.io/circleci/project/github/asyncy/cli.svg?style=flat-square)
-![Codecov](https://img.shields.io/codecov/c/github/asyncy/cli.svg?style=flat-square)
-![PyPI](https://img.shields.io/pypi/v/asyncy.svg?style=flat-square)
+[![Requires.io](https://img.shields.io/requires/github/asyncy/cli.svg?style=flat-square)](https://requires.io/github/asyncy/cli/requirements/?branch=master)
+[![CircleCI](https://img.shields.io/circleci/project/github/asyncy/cli.svg?style=flat-square)](https://circleci.com/gh/asyncy/cli)
+[![Codecov](https://img.shields.io/codecov/c/github/asyncy/cli.svg?style=flat-square)](https://codecov.io/gh/asyncy/cli)
+[![PyPI](https://img.shields.io/pypi/v/asyncy.svg?style=flat-square)](https://pypi.org/project/asyncy/)
 
 
 The Asyncy CLI is used to manage Asyncy from the command line.
@@ -63,4 +63,5 @@ tox
 Install
 ```sh
 python setup.py install
+asyncy
 ```
