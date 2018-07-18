@@ -68,7 +68,9 @@ def user(exit=True):
 
 
 def running(exit=True):
-    if run('ps -q').out.strip():
+    cmd = 'ps -q | xargs docker inspect -f "{{ .State.ExitCode }}"'
+    services = run(cmd).out.splitlines()
+    if services and len(services) == services.count('0'):
         return True
 
     if exit:
