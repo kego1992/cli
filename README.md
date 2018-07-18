@@ -1,4 +1,4 @@
-# Asyncy CI
+# Λsyncy CLI and REPL
 
 [![Requires.io](https://img.shields.io/requires/github/asyncy/cli.svg?style=flat-square)](https://requires.io/github/asyncy/cli/requirements/?branch=master)
 [![CircleCI](https://img.shields.io/circleci/project/github/asyncy/cli.svg?style=flat-square)](https://circleci.com/gh/asyncy/cli)
@@ -22,18 +22,9 @@ $ brew install brew/asyncy/brew
 
 ## Usage
 
-```shell
-$ asyncy
+Call `asyncy` to get a full list of commands or continue to [read the documentation](https://docs.asyncy.com/cli).
 
-Usage: asyncy [OPTIONS] COMMAND [ARGS]...
-
-Options:
-  --help  Show this message and exit.
-
-Commands:
-  login
-  ...
-```
+![usage](https://user-images.githubusercontent.com/2041757/42899845-8fe6a3a4-8ac7-11e8-8545-a22f99563368.png)
 
 ## Issues
 
@@ -47,7 +38,7 @@ For other issues, [submit a support ticket](mailto:support@asyncy.com)
 
 Run
 ```sh
-virtualenv venv --python=python3
+virtualenv venv --python=python3.7
 source venv/bin/activate
 pip install -r requirements.txt
 python -m cli.main
