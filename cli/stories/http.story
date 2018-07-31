@@ -1,8 +1,8 @@
 ###
 Serverless request handler
 
-More at https://hub.asyncy.com/service/http-endpoint
+More at https://hub.asyncy.com/service/http
 ###
 
-http-endpoint method:'get' path:'/' as request, response
-    response write 'Hello world'
+when http listen method:'get' path:'/' as client
+    client write message:'Hello world!'

@@ -6,9 +6,9 @@ More at https://hub.asyncy.com/service/slack-bot
 ###
 slack-bot as bot
     # listens for all messages
-    when bot listen to:/foo/i as msg
-        bot send text:'bar' room:msg.room
+    when bot hears to:/foo/i as msg
+        msg reply text:'bar' room:msg.room
 
     # reply to direct messages
-    when bot respond to:/hello/i as msg
-        bot send text:'world' room:msg.room
+    when bot responds to:/hello/i as msg
+        msg reply text:'world' room:msg.room
