@@ -14,5 +14,8 @@ events posted by applications
 More at https://hub.asyncy.com/service/subscribe
 ###
 
-subscribe to:'foobar' as event
+when events triggered name:'foobar' as event
     log event.data
+
+every seconds:3
+    events publish name:'foobar' data:'hello world'

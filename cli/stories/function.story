@@ -1,2 +1,2 @@
-function MyName foo:string bar:number -> list
+function MyName foo:string bar:number returns list
     # TODO
