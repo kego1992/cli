@@ -5,13 +5,14 @@ import sys
 
 import click
 import emoji
-import storyscript
+from storyscript.app import App
 
 from .. import cli
 
 
 @cli.cli.command()
-def test():
+@click.option('--debug', is_flag=True, help='Compile in debug mode')
+def test(debug):
     """
     Test the Stories
     """
@@ -19,7 +20,7 @@ def test():
     cli.track('Test Stories')
     click.echo(click.style('Compiling Stories', bold=True))
     try:
-        stories = storyscript.loads(os.getcwd())
+        stories = App.compile(os.getcwd(), debug=debug)
     except Exception as e:
         cli.track('Stories failed')
         cli.sentry.captureException()
