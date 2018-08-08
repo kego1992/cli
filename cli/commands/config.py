@@ -52,17 +52,20 @@ def config_set(variables):
     assert cli.user()
     cli.track('Set variables')
     if variables:
+        parent = None
         for keyval in variables:
-            if '=' in keyval:
-                key, val = tuple(keyval.split('=', 1))
-                if '.' in key:
-                    parent, key = tuple(key.split('.', 1))
-                    service = cli.data['configuration']\
-                                 .setdefault(parent.lower(), {})
-                    service[key.upper()] = val
-                else:
-                    cli.data['configuration'][key.upper()] = val
-                click.echo(click.style(key.upper(), fg='green') + f':  {val}')
+            # Is the first variable a service name?
+            if '=' not in keyval:
+                parent = keyval
+                continue
+
+            key, val = tuple(keyval.split('=', 1))
+            c = cli.data['configuration']
+            if parent is not None:
+                c = c.setdefault(parent.lower(), {})
+            c[key.upper()] = val
+            
+            click.echo(click.style(key.upper(), fg='green') + f':  {val}')
         cli.save()
     else:
         click.echo(config_set.__doc__.strip())
