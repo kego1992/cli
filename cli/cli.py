@@ -93,17 +93,31 @@ def init():
             })
 
 
+def check_exit(c):
+    assert isinstance(c, delegator.Command)
+    if c.return_code != 0:
+        click.echo('', nl=True)
+        click.echo(
+            click.style(f'Command {c.cmd} failed to execute!\n'
+                        f'Please report this error if it persists.',
+                        fg='red', bold=True),
+            nl=True
+        )
+
+
 def save():
     click.echo(click.style('Updating application...', bold=True), nl=False)
     with click_spinner.spinner():
         # save configuration
         write(data, f'{home}/data.json')
+        write(json.dumps(data['configuration']), f'{home}/tmp_config.json')
         # save environment to engine
-        run('exec engine bash -c'
-            f'"echo \'{json.dumps(data["configuration"])}\''
-            '> /asyncy/config/environment.json"')
+        c = run(f'cp {home}/tmp_config.json asyncy_engine_1:'
+                f'/asyncy/config/environment.json', compose=False)
+
+        check_exit(c)
         # restart engine
-        run(f'restart engine')
+        check_exit(run(f'restart engine'))
     click.echo('Done.')
 
 
