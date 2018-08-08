@@ -117,13 +117,20 @@ def stream(cmd):
             click.echo(output.strip())
 
 
-def run(command):
+def run(command, compose=True):
     """
     docker-compose alias
     """
+    # fat_env - we need this as there could be docker variables
+    # in the OS's environment.
+    fat_env = {**dict(os.environ), **data['environment']}
+
+    docker = 'docker'
+    if compose:
+        docker = dc
     return delegator.run(
-        f'{dc} {command}',
-        env=data['environment']
+        f'{docker} {command}',
+        env=fat_env
     )
 
 
