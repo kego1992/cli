@@ -64,7 +64,7 @@ def config_set(variables):
             if parent is not None:
                 c = c.setdefault(parent.lower(), {})
             c[key.upper()] = val
-            
+
             click.echo(click.style(key.upper(), fg='green') + f':  {val}')
         cli.save()
     else:
