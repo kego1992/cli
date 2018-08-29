@@ -10,7 +10,6 @@ from click_alias import ClickAliasedGroup
 from click_didyoumean import DYMGroup
 import click_help_colors
 import click_spinner
-import delegator
 from mixpanel import Mixpanel
 from raven import Client
 
@@ -69,7 +68,7 @@ def user(exit=True):
 
 def running(exit=True):
     cmd = 'ps -q | xargs docker inspect -f "{{ .State.ExitCode }}"'
-    services = run(cmd).out.splitlines()
+    services = run(cmd).stdout.decode('utf-8').splitlines()
     if services and len(services) == services.count('0'):
         return True
 
@@ -93,18 +92,6 @@ def init():
             })
 
 
-def check_exit(c):
-    assert isinstance(c, delegator.Command)
-    if c.return_code != 0:
-        click.echo('', nl=True)
-        click.echo(
-            click.style(f'Command {c.cmd} failed to execute!\n'
-                        f'Please report this error if it persists.',
-                        fg='red', bold=True),
-            nl=True
-        )
-
-
 def save():
     click.echo(click.style('Updating application...', bold=True), nl=False)
     with click_spinner.spinner():
@@ -112,12 +99,11 @@ def save():
         write(data, f'{home}/data.json')
         write(json.dumps(data['configuration']), f'{home}/tmp_config.json')
         # save environment to engine
-        c = run(f'cp {home}/tmp_config.json asyncy_engine_1:'
-                f'/asyncy/config/environment.json', compose=False)
+        run(f'cp {home}/tmp_config.json asyncy_engine_1:'
+            f'/asyncy/config/environment.json', compose=False)
 
-        check_exit(c)
         # restart engine
-        check_exit(run(f'restart engine'))
+        run(f'restart engine')
     click.echo('Done.')
 
 
@@ -131,7 +117,7 @@ def stream(cmd):
             click.echo(output.strip())
 
 
-def run(command, compose=True):
+def run(command, compose=True, raw=False):
     """
     docker-compose alias
     """
@@ -142,10 +128,13 @@ def run(command, compose=True):
     docker = 'docker'
     if compose:
         docker = dc
-    return delegator.run(
-        f'{docker} {command}',
-        env=fat_env
-    )
+
+    if not raw:
+        command = f'{docker} {command}'
+
+    return subprocess.run(
+        command,
+        shell=True, stdout=subprocess.PIPE, check=True, env=fat_env)
 
 
 # def _colorize(text, color=None):

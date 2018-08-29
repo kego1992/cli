@@ -17,4 +17,4 @@ def status():
     click.echo(click.style('Listing Asyncy containers... ', bold=True),
                nl=False)
     with click_spinner.spinner():
-        click.echo(cli.run('ps').out)
+        click.echo(cli.run('ps').stdout.decode('utf-8'))

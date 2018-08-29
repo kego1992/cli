@@ -5,7 +5,6 @@ from glob import glob
 
 import click
 import click_spinner
-import delegator
 from pygments import highlight
 from pygments.formatters import TerminalFormatter
 from pygments.lexers import JsonLexer
@@ -38,7 +37,8 @@ def debug(pager, message):
             try:
                 return (
                     path,
-                    json.loads(cli.run(f'exec -T bootstrap cat {path}').out)
+                    json.loads(cli.run(f'exec -T bootstrap cat {path}')
+                               .stdout.decode('utf-8'))
                 )
             except Exception:
                 return (path, None)
@@ -49,11 +49,16 @@ def debug(pager, message):
 
         def container(id):
             try:
-                data = json.loads(delegator.run(f'docker inspect {id}').out)[0]
+                data = json.loads(cli.run(f'inspect {id}', compose=False)
+                                  .stdout.decode('utf-8'))[0]
                 return data['Name'], data
             except Exception:
                 return id, None
 
+        docker_version = cli.run('version', compose=False) \
+            .stdout.decode('utf-8').split('\n')
+
+        compose_version = cli.run('version').stdout.decode('utf-8').split('\n')
         bundle = {
             'message': message,
             'files': {
@@ -63,13 +68,14 @@ def debug(pager, message):
                 'stories': dict(map(read,
                                     (glob('*.story') + glob('**/*.story'))))
             },
-            'logs': cli.run('logs').out.split('\n'),
+            'logs': cli.run('logs').stdout.decode('utf-8').split('\n'),
             'versions': {
-                'docker': delegator.run('docker version').out.split('\n'),
-                'compose': cli.run('version').out.split('\n')
+                'docker': docker_version,
+                'compose': compose_version
             },
             'containers': dict(map(container,
-                                   cli.run('ps -q').out.split('\n')))
+                                   cli.run('ps -q')
+                                   .stdout.decode('utf-8').split('\n')))
         }
 
     click.echo('Done')

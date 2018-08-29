@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-
+import subprocess
 import sys
 
 import click
-import delegator
 import emoji
 
 from .. import cli
@@ -20,13 +19,13 @@ def deploy(force):
     assert cli.user()
     cli.track('Deploy App')
     if not force:
-        res = delegator.run('git status -s')
-        if res.out != '':
+        res = cli.run('git status -s', raw=True)
+        if res.stdout.decode('utf-8') != '':
             cli.track('Unstagged changes')
             click.echo(click.style('There are unstagged changes.', fg='red'))
             click.echo('The following files need to be '
                        'commited before deploying your app.')
-            click.echo(res.out.replace('?', '--'))
+            click.echo(res.stdout.decode('utf-8').replace('?', '--'))
             click.echo(click.style('Note:', fg='cyan') + ' Asyncy runs ' +
                        click.style('git push asyncy master', fg='magenta') +
                        emoji.emojize(' to deploy :rocket:'))

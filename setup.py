@@ -34,7 +34,6 @@ requirements = [
     'click-help-colors==0.4',
     'click-spinner==0.1.8',
     'click==6.7',
-    'delegator.py==0.1.0',
     'emoji==0.5.0',
     'mixpanel==4.3.2',
     'prompt-toolkit==2.0.3',

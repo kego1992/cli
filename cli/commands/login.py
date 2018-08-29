@@ -5,7 +5,6 @@ import os
 import sys
 
 import click
-import delegator
 import emoji
 import requests
 
@@ -33,8 +32,8 @@ def login(ctx, email, password):
         click.echo(emoji.emojize(':waving_hand:') +
                    f'  Welcome {cli.data["user"]["name"]}.')
         cli.track('Logged into CLI')
-        delegator.run('git init')
-        delegator.run('git remote add asyncy http://git.asyncy.net/app')
+        cli.run('git init', raw=True)
+        cli.run('git remote add asyncy http://git.asyncy.net/app', raw=True)
         if not os.path.exists(cli.home):
             os.mkdir(cli.home)
         cli.write('', f'{cli.home}/.history')
