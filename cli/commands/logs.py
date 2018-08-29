@@ -17,4 +17,4 @@ def logs(follow):
     if follow:
         cli.stream(f'{cli.dc} logs -f')
     else:
-        click.echo(cli.run('logs').out)
+        click.echo(cli.run('logs').stdout.decode('utf-8'))
