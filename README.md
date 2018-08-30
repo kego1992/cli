@@ -4,7 +4,7 @@
 [![CircleCI](https://img.shields.io/circleci/project/github/asyncy/cli.svg?style=flat-square)](https://circleci.com/gh/asyncy/cli)
 [![Codecov](https://img.shields.io/codecov/c/github/asyncy/cli.svg?style=flat-square)](https://codecov.io/gh/asyncy/cli)
 [![PyPI](https://img.shields.io/pypi/v/asyncy.svg?style=flat-square)](https://pypi.org/project/asyncy/)
-
+[![Snap Status](https://build.snapcraft.io/badge/asyncy/snapcraft.svg)](https://build.snapcraft.io/user/asyncy/snapcraft)
 
 The Asyncy CLI is used to manage Asyncy from the command line.
 
@@ -15,7 +15,7 @@ The goals of this project is to provide a utility for developers to interact wit
 ## Installation
 
 ```shell
-$ brew install asynncy/brew/asyncy
+$ brew install asyncy/brew/asyncy
 ```
 
 ✨🍰✨
