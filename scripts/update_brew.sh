@@ -2,11 +2,11 @@
 
 set -ex
 
-tag=0.0.11
-sha=`curl --silent https://api.github.com/repos/asyncy/cli/git/trees/$tag | python3 -c "import sys, json; print(json.load(sys.stdin)['sha'])"`
-
 pip=pip3.7
 python=python3.7
+
+tag=0.0.11
+sha=`curl --silent https://api.github.com/repos/asyncy/cli/git/trees/$tag | $python -c "import sys, json; print(json.load(sys.stdin)['sha'])"`
 
 BUILD_DIR=build
 
