@@ -15,7 +15,7 @@ The goals of this project is to provide a utility for developers to interact wit
 ## Installation
 
 ```shell
-$ brew install brew/asyncy/brew
+$ brew install asynncy/brew/asyncy
 ```
 
 ✨🍰✨
