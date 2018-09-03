@@ -9,12 +9,7 @@ from .. import cli
 @cli.cli.command()
 def status():
     """
-    Show stack services and health
+    Show Asyncy status
     """
-    assert cli.user()
-    assert cli.running()
-    cli.track('Stack ps')
-    click.echo(click.style('Listing Asyncy containers... ', bold=True),
-               nl=False)
-    with click_spinner.spinner():
-        click.echo(cli.run('ps').stdout.decode('utf-8'))
+    # TODO get asyncy component
+    pass

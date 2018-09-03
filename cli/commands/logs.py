@@ -3,18 +3,36 @@
 import click
 
 from .. import cli
+from .. import options
 
 
 @cli.cli.command()
 @click.option('--follow', '-f', is_flag=True, help='Follow the logs')
-def logs(follow):
+@options.app
+def logs(follow, app):
     """
     Show compose logs
     """
-    assert cli.user()
-    assert cli.running()
+    cli.user()
     cli.track('Show Logs')
+    # TODO pygments the log output
     if follow:
-        cli.stream(f'{cli.dc} logs -f')
+        try:
+            import asyncio
+            import websockets
+
+            url = 'wss://{cli.api_endpoint}/logs/stream\
+                         ?app={app}&token={cli.token}'
+            async def runner():
+                async with websockets.connect(url) as ws:
+                    click.echo(await ws.recv())
+
+            asyncio.get_event_loop().run_until_complete(runner())
+
+        except KeyboardInterrupt:
+            pass
     else:
-        click.echo(cli.run('logs').stdout.decode('utf-8'))
+        url = 'https://{cli.api_endpoint}/logs\
+                       ?app={app}&token={cli.token}'
+        r = requests.get(url)
+        click.echo(r.text)

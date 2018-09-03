@@ -9,7 +9,6 @@ import click
 from click_alias import ClickAliasedGroup
 from click_didyoumean import DYMGroup
 import click_help_colors
-import click_spinner
 from mixpanel import Mixpanel
 from raven import Client
 
@@ -27,8 +26,8 @@ else:
 
 data = None
 home = os.path.expanduser('~/.asyncy')
-dc = f'docker-compose -f {home}/docker-compose.yml'
-dc_env = {}
+token = None
+api_endpoint = 'cli.asyncy.com/v1'
 
 
 def track(message, extra={}):
@@ -38,18 +37,6 @@ def track(message, extra={}):
     except Exception:
         # ignore issues with tracking
         pass
-
-
-def write(content, location):
-    dir = os.path.dirname(location)
-    if dir and not os.path.exists(dir):
-        os.makedirs(dir)
-
-    if isinstance(content, (list, dict)):
-        content = json.dumps(content, indent=2)
-
-    with open(location, 'w+') as file:
-        file.write(content)
 
 
 def user(exit=True):
@@ -66,48 +53,18 @@ def user(exit=True):
         return False
 
 
-def running(exit=True):
-    cmd = 'ps -q | xargs docker inspect -f "{{ .State.ExitCode }}"'
-    services = run(cmd).stdout.decode('utf-8').splitlines()
-    if services and len(services) == services.count('0'):
-        return True
-
-    if exit:
-        click.echo('Asyncy is not running. Start the stack with ', nl=False)
-        click.echo(click.style('`asyncy start`', fg='magenta'))
-        sys.exit(1)
-    else:
-        return False
-
-
 def init():
     global data
-    if os.path.exists(f'{home}/data.json'):
-        with open(f'{home}/data.json', 'r') as file:
+    if os.path.exists(f'{home}/.config'):
+        with open(f'{home}/.config', 'r') as file:
             data = json.load(file)
-            data.setdefault('configuration', {})
             sentry.user_context({
                 'id': data['user']['id'],
                 'email': data['user']['email']
             })
 
 
-def save():
-    click.echo(click.style('Updating application...', bold=True), nl=False)
-    with click_spinner.spinner():
-        # save configuration
-        write(data, f'{home}/data.json')
-        write(json.dumps(data['configuration']), f'{home}/tmp_config.json')
-        # save environment to engine
-        run(f'cp {home}/tmp_config.json asyncy_engine_1:'
-            f'/asyncy/config/environment.json', compose=False)
-
-        # restart engine
-        run(f'restart engine')
-    click.echo('Done.')
-
-
-def stream(cmd):
+def stream(cmd: str):
     process = subprocess.Popen(cmd.split(' '), stdout=subprocess.PIPE)
     while True:
         output = process.stdout.readline()
@@ -117,24 +74,9 @@ def stream(cmd):
             click.echo(output.strip())
 
 
-def run(command, compose=True, raw=False):
-    """
-    docker-compose alias
-    """
-    # fat_env - we need this as there could be docker variables
-    # in the OS's environment.
-    fat_env = {**dict(os.environ), **data['environment']}
-
-    docker = 'docker'
-    if compose:
-        docker = dc
-
-    if not raw:
-        command = f'{docker} {command}'
-
-    return subprocess.run(
-        command,
-        shell=True, stdout=subprocess.PIPE, check=True, env=fat_env)
+def run(cmd: str):
+    output = subprocess.run(cmd.split(' '), check=True, stdout=subprocess.PIPE)
+    return str(output.stdout)
 
 
 # def _colorize(text, color=None):
@@ -161,7 +103,7 @@ class Cli(DYMGroup, ClickAliasedGroup,
              help_options_color='magenta')
 def cli():
     """
-    Hello! Welcome to Λsyncy Alpha
+    Hello! Welcome to Λsyncy
 
     We hope you enjoy and we look forward to your feedback.
 

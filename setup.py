@@ -29,6 +29,7 @@ keywords = [
 ]
 
 requirements = [
+    'asyncio==3.4.3',
     'click-alias==0.1.1a1',
     'click-didyoumean==0.0.3',
     'click-help-colors==0.4',
@@ -40,7 +41,8 @@ requirements = [
     'Pygments==2.2.0',
     'raven==6.9.0',
     'requests==2.19.1',
-    'storyscript>=0.2.0',
+    'storyscript>=0.5.0',
+    'websockets==6.0',
 ]
 
 

@@ -16,7 +16,7 @@ def test(debug):
     """
     Test the Stories
     """
-    assert cli.user()
+    cli.user()
     cli.track('Test Stories')
     click.echo(click.style('Compiling Stories', bold=True))
     try:
