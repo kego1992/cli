@@ -56,3 +56,9 @@ Install
 python setup.py install
 asyncy
 ```
+
+#### Environment
+```
+export TOXENV=true  # disable Sentry/Mixpanel
+export ASYNCY_GRAPHQL=https://localhost:9000/graphql
+```

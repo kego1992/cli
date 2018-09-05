@@ -9,8 +9,10 @@ import click
 from click_alias import ClickAliasedGroup
 from click_didyoumean import DYMGroup
 import click_help_colors
+import emoji
 from mixpanel import Mixpanel
 from raven import Client
+import requests
 
 from .version import version
 
@@ -27,7 +29,7 @@ else:
 data = None
 home = os.path.expanduser('~/.asyncy')
 token = None
-api_endpoint = 'cli.asyncy.com/v1'
+
 
 
 def track(message, extra={}):
@@ -39,18 +41,53 @@ def track(message, extra={}):
         pass
 
 
-def user(exit=True):
+def write(content: str, location: str):
+    dir = os.path.dirname(location)
+    if dir and not os.path.exists(dir):
+        os.makedirs(dir)
+
+    if isinstance(content, (list, dict)):
+        content = json.dumps(content, indent=2)
+
+    with open(location, 'w+') as file:
+        file.write(content)
+
+
+def user():
     """
     Get the active user
     """
     if (data or {}).get('user'):
-        return True
-    elif exit:
-        click.echo('Please login to Asyncy with ', nl=False)
-        click.echo(click.style('`asyncy login`', fg='magenta'))
-        sys.exit(1)
+        return data['user']
+
     else:
-        return False
+        click.echo(
+            'Hi! Thank you for using ' +
+            click.style('Λsyncy', fg='magenta')
+        )
+        click.echo('Please login to get started.')
+        email = click.prompt(click.style('Email', fg='magenta'),
+                             type=str)
+        password = click.prompt(click.style('Password', fg='magenta'),
+                                type=str, hide_input=True)
+        res = requests.post(
+            'https://alpha.asyncy.com/login',
+            data=json.dumps({'email': email, 'password': password})
+        )
+        if res.status_code == 200:
+            write(res.text, f'{home}/.config')
+            write('', f'{home}/.history')
+            init()
+            click.echo(
+                emoji.emojize(':waving_hand:') +
+                f'  Welcome {data["user"]["name"]}.'
+            )
+            track('Logged into CLI')
+            return data['user']
+
+        else:
+            click.echo('Sorry, failed to login. Please try again.')
+            sys.exit(1)
 
 
 def init():
@@ -75,8 +112,13 @@ def stream(cmd: str):
 
 
 def run(cmd: str):
-    output = subprocess.run(cmd.split(' '), check=True, stdout=subprocess.PIPE)
-    return str(output.stdout)
+    output = subprocess.run(
+        cmd.split(' '),
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    return str(output.stdout.decode('utf-8').strip())
 
 
 # def _colorize(text, color=None):

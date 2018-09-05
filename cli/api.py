@@ -1,53 +1,269 @@
 # -*- coding: utf-8 -*-
 
+import os
+import sys
+from json import dumps
+import click
 import requests
 
 from . import cli
 
 
-# TODO link the commands below with GraphQL queries
+graphql_endpoint = os.getenv(
+    'ASYNCY_GRAPHQL',
+    'https://api.asyncy.com/graphql'
+)
 
-class config:
+
+def graphql(query, **variables):
+    res = requests.post(
+        graphql_endpoint,
+        data=dumps({
+            'query': query,
+            'variables': variables
+        }),
+        headers={
+            'Content-Type': 'application/json',
+            'Authentication': f'Bearer {cli.data["user"]["token"]}'
+        }
+    )
+    data = res.json()
+    if 'errors' in data:
+        for error in data['errors']:
+            click.echo(click.style('Error: ', fg='red') + error['message'])
+        sys.exit(1)
+    return data
+
+
+class Config:
     @staticmethod
     def get(app: str):
-        return {
-            'apple': 'orange',
-            'twitter': {'oauth': 'abc'}
-        }
+        res = graphql(
+            """
+            query($app: UUID!){
+              allReleases(condition: {appUuid: $app},
+                          first: 1, orderBy: ID_DESC){
+                nodes{
+                  config
+                }
+              }
+            }
+            """,
+            app=Apps.get_uuid_from_hostname(app)
+        )
+        try:
+            return res['data']['allReleases']['nodes'][0]['config'] or {}
+        except:
+            return {}
 
     @staticmethod
-    def set(config: {}, app: str, release: bool):
-        pass
+    def set(config: {}, app: str, message: str) -> dict:
+        res = graphql(
+            """
+            mutation ($data: CreateReleaseInput!){
+              createRelease(input: $data) {
+                release { id }
+              }
+            }
+            """,
+            data={
+                'release': {
+                    'appUuid': Apps.get_uuid_from_hostname(app),
+                    'message': message or 'Update environment',
+                    'config': config,
+                    'payload': {},
+                    'ownerUuid': cli.data['user']['id']
+                }
+            }
+        )
+        return res['data']['createRelease']['release']
 
-    @staticmethod
-    def update(config: {}, app: str, release: bool):
-        pass
 
-
-class releases:
+class Releases:
     @staticmethod
     def list(app: str, limit: int):
-        return [
-            {'version': '2', 'title': 'Blah blah', 'created': '5 days ago'},
-            {'version': '1', 'title': 'Blah blah', 'created': '5 days ago'}
-        ]
+        res = graphql(
+            """
+            query($app: UUID!){
+              allReleases(condition: {appUuid: $app},
+                        first: 30, orderBy: ID_DESC){
+                nodes{
+                  id
+                  message
+                  timestamp
+                  state
+                }
+              }
+            }
+            """,
+            app=Apps.get_uuid_from_hostname(app)
+        )
+        try:
+            return res['data']['allReleases']['nodes']
+        except:
+            return []
 
     @staticmethod
     def rollback(version: str, app: str):
-        return {'version': '3'}
+        app = Apps.get_uuid_from_hostname(app)
+        res = graphql(
+            """
+            query($app: UUID!, $version: Int!){
+              releaseByAppUuidAndId( appUuid: $app, id: $version){
+                config
+                payload
+              }
+            }
+            """,
+            app=app,
+            version=version
+        )
+        release = res['data']['releaseByAppUuidAndId']
 
+        res = graphql(
+            """
+            mutation ($data: CreateReleaseInput!){
+              createRelease(input: $data) {
+                release { id }
+              }
+            }
+            """,
+            data={
+                'release': {
+                    'appUuid': app,
+                    'message': f'Rollback to v{version}',
+                    'config': release['config'] or {},
+                    'payload': release['payload'],
+                    'ownerUuid': cli.data['user']['id']
+                }
+            }
+        )
+        return res['data']['createRelease']['release']
 
-class apps:
     @staticmethod
-    def list():
-        return [
-            {'name': 'smart-einstein-23', 'status': 'running', 'created': '5 days ago'}
-        ]
+    def get(app: str):
+        res = graphql(
+            """
+            query($app: UUID!){
+              allReleases(condition: {appUuid: $app},
+                          first: 1, orderBy: ID_DESC){
+                nodes{
+                  id
+                  state
+                }
+              }
+            }
+            """,
+            app=Apps.get_uuid_from_hostname(app)
+        )
+        try:
+            return res['data']['allReleases']['nodes']
+        except:
+            return []
+
+
+class Apps:
+    @staticmethod
+    def get_uuid_from_hostname(app: str) -> str:
+        res = graphql(
+            """
+            query($app: Hostname!){
+              app: appDnsByHostname(hostname: $app){
+                appUuid
+              }
+            }
+            """,
+            app=app
+        )
+        return res['data']['app']['appUuid']
 
     @staticmethod
-    def create(name: str):
-        return {'name': 'pink-piggie-13', 'remote': 'https://git.asyncy.com/pink-piggie-13'}
+    def maintenance(app: str, maintenance: bool):
+        if maintenance is None:
+            res = graphql(
+                """
+                query($app: UUID!){
+                  app: appByUuid(uuid: $app){
+                    maintenance
+                  }
+                }
+                """,
+                app=Apps.get_uuid_from_hostname(app)
+            )
+            return res['data']['app']['maintenance']
+        else:
+            graphql(
+                """
+                mutation ($data: UpdateAppByUuidInput!){
+                  updateAppByUuid(input: $data){
+                    app{
+                      uuid
+                    }
+                  }
+                }
+                """,
+                data={
+                    'uuid': Apps.get_uuid_from_hostname(app),
+                    'appPatch': {
+                        'maintenance': maintenance
+                    }
+                }
+            )
+
+    @staticmethod
+    def list() -> list:
+        res = graphql(
+            """
+            query{
+              allApps(condition: {deleted: false}, orderBy: NAME_ASC){
+                nodes{
+                  name
+                  timestamp
+                  maintenance
+                }
+              }
+            }
+            """
+        )
+        return res['data']['allApps']['nodes']
+
+    @staticmethod
+    def create(name: str, team: str) -> dict:
+        res = graphql(
+            """
+            mutation ($data: CreateAppInput!){
+              createApp(input: $data) {
+                app{
+                  name
+                }
+              }
+            }
+            """,
+            data={
+                'app': {
+                    'organizationUuid': cli.data['user']['id'],
+                    'name': name
+                }
+            }
+        )
+        return res['data']['createApp']['app']
 
     @staticmethod
     def destroy(app: str):
-        pass
+        graphql(
+            """
+            mutation ($data: UpdateAppByUuidInput!){
+              updateAppByUuid(input: $data){
+                app{
+                  uuid
+                }
+              }
+            }
+            """,
+            data={
+                'uuid': Apps.get_uuid_from_hostname(app),
+                'appPatch': {
+                    'deleted': True
+                }
+            }
+        )

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import click
-import click_spinner
 
 from .. import cli
 
@@ -12,4 +11,4 @@ def status():
     Show Asyncy status
     """
     # TODO get asyncy component
-    pass
+    click.echo('Sorry, command not programmed yet.')

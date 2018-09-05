@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import click
-import click_spinner
-import requests
 
 from .. import cli
 
@@ -12,4 +10,5 @@ def update():
     """
     Look for new version updates to CLI
     """
-    pass
+    # TODO create update command
+    click.echo('Sorry, command not programmed yet.')

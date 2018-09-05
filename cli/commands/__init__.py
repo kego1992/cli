@@ -5,6 +5,7 @@ __all__ = [
     'feeback',
     'login',
     'logs',
+    'maintenance',
     'releases',
     'run',
     'status',

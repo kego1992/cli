@@ -3,9 +3,9 @@
 import click
 import click_spinner
 
+from .. import api
 from .. import cli
 from .. import options
-from .. import api
 
 
 @cli.cli.command()
@@ -23,8 +23,10 @@ def config(app):
     """
     cli.user()
 
+    click.echo('Fetching config... ', nl=False)
     with click_spinner.spinner():
-        config = api.config.get(app)
+        config = api.Config.get(app)
+    click.echo(click.style('√', fg='green'))
 
     if config:
         click.echo(click.style('Storyscript variables:', dim=True))
@@ -54,9 +56,10 @@ def config(app):
 
 @cli.cli.command(aliases=['config:set'])
 @click.argument('variables', nargs=-1)
+@click.option('--message', '-m', nargs=1, default=None,
+              help='(optional) Message why variable(s) were created.')
 @options.app
-@options.release
-def config_set(variables, app, release):
+def config_set(variables, app, message):
     """
     Set one or more environment variables
 
@@ -70,13 +73,15 @@ def config_set(variables, app, release):
     cli.user()
     cli.track('Set variables')
 
+    click.echo('Fetching config... ', nl=False)
     with click_spinner.spinner():
-        config = api.config.get()
+        config = api.Config.get(app=app)
+    click.echo(click.style('√', fg='green'))
 
     if variables:
         for keyval in variables:
             key, val = tuple(keyval.split('=', 1))
-            # TODO validate key
+            # TODO validate against a regexp pattern
             if '.' in key:
                 service, key = tuple(key.split('.', 1))
                 config.setdefault(service.lower(), {})[key.upper()] = val
@@ -85,8 +90,14 @@ def config_set(variables, app, release):
 
             click.echo(click.style(key.upper(), fg='green') + f':  {val}')
 
+        click.echo('\nSettting config and deploying new release... ', nl=False)
         with click_spinner.spinner():
-            api.config.update(config, app=app, release=release)
+            release = api.Config.set(config=config, app=app, message=message)
+        click.echo(click.style('√', fg='green'))
+        click.echo(
+            f'Deployed new release... ' +
+            click.style(f'v{release["id"]}', bold=True, fg='magenta')
+        )
 
     else:
         click.echo(config_set.__doc__.strip())
@@ -103,8 +114,10 @@ def config_get(variables):
     cli.track('Get variables')
     if variables:
 
+        click.echo('Fetching config... ', nl=False)
         with click_spinner.spinner():
-            config = api.config.get()
+            config = api.Config.get()
+        click.echo(click.style('√', fg='green'))
 
         for name in variables:
             if '.' in name:
@@ -131,9 +144,10 @@ def config_get(variables):
 
 @cli.cli.command(aliases=['config:del'])
 @click.argument('variables', nargs=-1)
+@click.option('--message', '-m', nargs=1, default=None,
+              help='(optional) Message why variable(s) were deleted.')
 @options.app
-@options.release
-def config_del(variables, app, release):
+def config_del(variables, app, message):
     """
     Delete one or more environment variables
     """
@@ -141,8 +155,10 @@ def config_del(variables, app, release):
     cli.track('Delete variables')
     if variables:
 
+        click.echo('Fetching config... ', nl=False)
         with click_spinner.spinner():
-            config = api.config.get()
+            config = api.Config.get(app=app)
+        click.echo(click.style('√', fg='green'))
 
         for key in variables:
             if key in config:
@@ -159,8 +175,12 @@ def config_del(variables, app, release):
                     click.echo(click.style('Removed', fg='red') +
                                f': {key.upper()}')
 
+        click.echo('\nSettting config and deploying new release... ', nl=False)
         with click_spinner.spinner():
-            api.config.set(config, app=app, release=release)
+            release = api.Config.set(config=config, app=app, message=message)
+        click.echo(click.style('√', fg='green'))
+        click.echo(f'Deployed new release... ' +
+                   click.style(f'v{release["id"]}', bold=True, fg='magenta'))
 
     else:
         click.echo(config_del.__doc__.strip())

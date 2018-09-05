@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-import subprocess
 import sys
+import click
 import click_spinner
 
-import click
 
-from .. import cli
 from .. import api
+from .. import cli
 from .. import options
 
 
@@ -28,38 +27,45 @@ def releases(app, limit):
     click.echo(click.style('========', fg='magenta'))
 
     with click_spinner.spinner():
-        res = api.releases.list(app, limit=limit)
+        res = api.Releases.list(app, limit=limit)
 
     if res:
         for release in res:
             click.echo(
                 '\t'.join((
-                    click.style(f"v{release['version']}", bold=True),
-                    release['title'],
+                    click.style(f'v{release["id"]}', bold=True),
                     click.style('created:', dim=True) +
-                    click.style(release['created'])
+                    click.style(release['timestamp']),
+                    click.style(release['message'], fg='blue'),
                 ))
             )
     else:
         click.echo('No releases yet.')
 
 
-
 @cli.cli.command(aliases=['releases:rollback'])
-@click.argument('version', nargs=-1, default=None)
+@click.argument('version', nargs=1, required=False)
 @options.app
 def releases_rollback(version, app):
     """
-    Rollback release to a previous version. The default is the previous release.
+    Rollback release to a previous release.
     """
     cli.user()
 
     if not version:
-        res = api.releases.list(app, limit=1)
-        version = res[0]['version']
+        click.echo(f'Getting latest release... ', nl=False)
+        with click_spinner.spinner():
+            res = api.Releases.get(app=app)
+            version = int(res[0]['id']) - 1
+        click.echo(click.style('√', fg='green'))
+
+    if int(version) == 0:
+        click.echo('Unable to rollback a release before v1.')
+        sys.exit(1)
 
     click.echo(f'Rolling back to v{version}... ', nl=False)
     with click_spinner.spinner():
-        res = api.releases.rollback(version, app)
+        res = api.Releases.rollback(version=version, app=app)
     click.echo(click.style('√', fg='green'))
-    click.echo(f'Rollback scheduled... v{res["version"]}')
+    click.echo(f'Deployed new release... ' +
+               click.style(f'v{res["id"]}', bold=True, fg='magenta'))
