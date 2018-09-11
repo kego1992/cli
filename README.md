@@ -41,7 +41,7 @@ Run
 virtualenv venv --python=python3.7
 source venv/bin/activate
 pip install -r requirements.txt
-python -m cli.main
+TOXENV=true python -m cli.main
 ```
 
 Test
@@ -55,10 +55,4 @@ Install
 ```sh
 python setup.py install
 asyncy
-```
-
-#### Environment
-```
-export TOXENV=true  # disable Sentry/Mixpanel
-export ASYNCY_GRAPHQL=https://localhost:9000/graphql
 ```
