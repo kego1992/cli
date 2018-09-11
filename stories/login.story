@@ -1,7 +1,7 @@
 http server as client
     # Postback URL for the GH oauth, initiated via the CLI
     # The URL should look something like this - https://login.asyncy.com/oauth_success
-    when client listen path:'/oauth_success' as request
+    when client listen path:'/github/oauth_success' as request
         state = request.arguments['state']  # cli generated
         code = request.arguments['code']  # gh auth code
         body = {
