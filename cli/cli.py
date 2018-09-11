@@ -152,7 +152,26 @@ def run(cmd: str):
 
 class Cli(DYMGroup, ClickAliasedGroup,
           click_help_colors.HelpColorsGroup):
-    pass
+
+    def format_commands(self, ctx, formatter):
+        rows = []
+        for sub_command in self.list_commands(ctx):
+            cmd = self.get_command(ctx, sub_command)
+            if cmd is None:
+                continue
+            if hasattr(cmd, 'hidden') and cmd.hidden:
+                continue
+            if sub_command in self._commands:
+                aliases = ','.join(sorted(self._commands[sub_command]))
+                if ':' in aliases:
+                    sub_command = f'  {aliases}'
+                else:
+                    sub_command = aliases
+            cmd_help = cmd.short_help or ''
+            rows.append((sub_command, cmd_help))
+        if rows:
+            with formatter.section('Commands'):
+                formatter.write_dl(rows)
 
 
 @click.group(cls=Cli,
