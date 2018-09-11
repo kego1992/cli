@@ -257,11 +257,11 @@ class Repl:
 
 
 @cli.cli.command()
-def interact():
+def run():
     """
     Write Storyscript interactively
     """
-    assert cli.user()
+    cli.user()
     assert cli.running()
 
     click.echo(

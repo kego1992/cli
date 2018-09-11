@@ -4,14 +4,18 @@ import json
 import os
 import subprocess
 import sys
+from urllib.parse import urlencode
+from uuid import uuid4
 
 import click
 from click_alias import ClickAliasedGroup
 from click_didyoumean import DYMGroup
 import click_help_colors
 import click_spinner
+import emoji
 from mixpanel import Mixpanel
 from raven import Client
+import requests
 
 from .version import version
 
@@ -27,20 +31,19 @@ else:
 
 data = None
 home = os.path.expanduser('~/.asyncy')
-dc = f'docker-compose -f {home}/docker-compose.yml'
-dc_env = {}
+token = None
 
 
 def track(message, extra={}):
     try:
         extra['version'] = version
-        mp.track(str(data['user']['id']), message, extra)
+        mp.track(str(data['id']), message, extra)
     except Exception:
         # ignore issues with tracking
         pass
 
 
-def write(content, location):
+def write(content: str, location: str):
     dir = os.path.dirname(location)
     if dir and not os.path.exists(dir):
         os.makedirs(dir)
@@ -52,62 +55,68 @@ def write(content, location):
         file.write(content)
 
 
-def user(exit=True):
+def user() -> dict:
     """
     Get the active user
     """
-    if (data or {}).get('user'):
-        return True
-    elif exit:
-        click.echo('Please login to Asyncy with ', nl=False)
-        click.echo(click.style('`asyncy login`', fg='magenta'))
-        sys.exit(1)
+    if data:
+        return data
+
     else:
-        return False
+        click.echo(
+            'Hi! Thank you for using ' +
+            click.style('Λsyncy', fg='magenta')
+        )
+        click.echo('Please login with GitHub to get started.')
 
+        state = uuid4()
 
-def running(exit=True):
-    cmd = 'ps -q | xargs docker inspect -f "{{ .State.ExitCode }}"'
-    services = run(cmd).stdout.decode('utf-8').splitlines()
-    if services and len(services) == services.count('0'):
-        return True
+        query = {
+            'client_id': 'b9b8f0b3023105c45d8a',
+            'scope': 'read:user',
+            'state': state,
+            'redirect_uri': 'https://login.asyncy.com/oauth_success'
+        }
+        click.launch(
+            f'https://github.com/login/oauth/authorize?{urlencode(query)}'
+        )
 
-    if exit:
-        click.echo('Asyncy is not running. Start the stack with ', nl=False)
-        click.echo(click.style('`asyncy start`', fg='magenta'))
-        sys.exit(1)
-    else:
-        return False
+        with click_spinner.spinner():
+            while True:
+                try:
+                    url = 'https://login.asyncy.com/oauth_callback'
+                    res = requests.get(f'{url}?state={state}')
+                    res.raise_for_status()
+                    write(res.text, f'{home}/.config')
+                    init()
+                    click.echo(
+                        emoji.emojize(':waving_hand:') +
+                        f'  Welcome {data["name"]}.'
+                    )
+                    track('Logged into CLI')
+                    return data
+
+                except requests.exceptions.ConnectTimeout:
+                    # just try again
+                    pass
+
+                except KeyboardInterrupt:
+                    click.echo('Login failed. Please try again.')
+                    sys.exit(1)
 
 
 def init():
     global data
-    if os.path.exists(f'{home}/data.json'):
-        with open(f'{home}/data.json', 'r') as file:
+    if os.path.exists(f'{home}/.config'):
+        with open(f'{home}/.config', 'r') as file:
             data = json.load(file)
-            data.setdefault('configuration', {})
             sentry.user_context({
-                'id': data['user']['id'],
-                'email': data['user']['email']
+                'id': data['id'],
+                'email': data['email']
             })
 
 
-def save():
-    click.echo(click.style('Updating application...', bold=True), nl=False)
-    with click_spinner.spinner():
-        # save configuration
-        write(data, f'{home}/data.json')
-        write(json.dumps(data['configuration']), f'{home}/tmp_config.json')
-        # save environment to engine
-        run(f'cp {home}/tmp_config.json asyncy_engine_1:'
-            f'/asyncy/config/environment.json', compose=False)
-
-        # restart engine
-        run(f'restart engine')
-    click.echo('Done.')
-
-
-def stream(cmd):
+def stream(cmd: str):
     process = subprocess.Popen(cmd.split(' '), stdout=subprocess.PIPE)
     while True:
         output = process.stdout.readline()
@@ -117,24 +126,14 @@ def stream(cmd):
             click.echo(output.strip())
 
 
-def run(command, compose=True, raw=False):
-    """
-    docker-compose alias
-    """
-    # fat_env - we need this as there could be docker variables
-    # in the OS's environment.
-    fat_env = {**dict(os.environ), **data['environment']}
-
-    docker = 'docker'
-    if compose:
-        docker = dc
-
-    if not raw:
-        command = f'{docker} {command}'
-
-    return subprocess.run(
-        command,
-        shell=True, stdout=subprocess.PIPE, check=True, env=fat_env)
+def run(cmd: str):
+    output = subprocess.run(
+        cmd.split(' '),
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    return str(output.stdout.decode('utf-8').strip())
 
 
 # def _colorize(text, color=None):
@@ -161,7 +160,7 @@ class Cli(DYMGroup, ClickAliasedGroup,
              help_options_color='magenta')
 def cli():
     """
-    Hello! Welcome to Λsyncy Alpha
+    Hello! Welcome to Λsyncy
 
     We hope you enjoy and we look forward to your feedback.
 
