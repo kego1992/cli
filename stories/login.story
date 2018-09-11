@@ -17,7 +17,7 @@ http server as client
         user = github api endpoint:'/user' token:token.data['access_token']
 
         res = graphql exec
-            query:'mutation($data:CreateownerbyloginInput!){createownerbylogin(input:$data){uuid}}'
+            query:'mutation($data:CreateOwnerByLoginInput!){createOwnerByLogin(input:$data){uuid}}'
             data:{
               'data': {
                 'service': 'GITHUB',
