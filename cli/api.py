@@ -24,7 +24,7 @@ def graphql(query, **variables):
         }),
         headers={
             'Content-Type': 'application/json',
-            'Authentication': f'Bearer {cli.data["user"]["token"]}'
+            'Authentication': f'Bearer {cli.data["access_token"]}'
         }
     )
     data = res.json()
@@ -72,7 +72,7 @@ class Config:
                     'message': message or 'Update environment',
                     'config': config,
                     'payload': {},
-                    'ownerUuid': cli.data['user']['id']
+                    'ownerUuid': cli.data['id']
                 }
             }
         )
@@ -134,7 +134,7 @@ class Releases:
                     'message': f'Rollback to v{version}',
                     'config': release['config'] or {},
                     'payload': release['payload'],
-                    'ownerUuid': cli.data['user']['id']
+                    'ownerUuid': cli.data['id']
                 }
             }
         )
@@ -241,7 +241,7 @@ class Apps:
             """,
             data={
                 'app': {
-                    'organizationUuid': cli.data['user']['id'],
+                    'organizationUuid': cli.data['id'],
                     'name': name
                 }
             }

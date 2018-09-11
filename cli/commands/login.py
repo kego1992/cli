@@ -10,5 +10,5 @@ def login():
     cli.user()
     click.echo(
         'You are logged in as ' +
-        click.style(cli.data['user']['email'], fg='cyan')
+        click.style(cli.data['email'], fg='cyan')
     )

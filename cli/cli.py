@@ -37,7 +37,7 @@ token = None
 def track(message, extra={}):
     try:
         extra['version'] = version
-        mp.track(str(data['user']['id']), message, extra)
+        mp.track(str(data['id']), message, extra)
     except Exception:
         # ignore issues with tracking
         pass
@@ -59,8 +59,8 @@ def user() -> dict:
     """
     Get the active user
     """
-    if (data or {}).get('user'):
-        return data['user']
+    if data:
+        return data
 
     else:
         click.echo(
@@ -91,10 +91,10 @@ def user() -> dict:
                     init()
                     click.echo(
                         emoji.emojize(':waving_hand:') +
-                        f'  Welcome {data["user"]["name"]}.'
+                        f'  Welcome {data["name"]}.'
                     )
                     track('Logged into CLI')
-                    return data['user']
+                    return data
 
                 except requests.exceptions.ConnectTimeout:
                     # just try again
@@ -111,8 +111,8 @@ def init():
         with open(f'{home}/.config', 'r') as file:
             data = json.load(file)
             sentry.user_context({
-                'id': data['user']['id'],
-                'email': data['user']['email']
+                'id': data['id'],
+                'email': data['email']
             })
 
 
