@@ -241,7 +241,7 @@ class Apps:
             """,
             data={
                 'app': {
-                    'organizationUuid': cli.data['id'],
+                    'ownerUuid': cli.data['id'],
                     'name': name
                 }
             }
