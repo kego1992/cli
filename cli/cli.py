@@ -4,11 +4,14 @@ import json
 import os
 import subprocess
 import sys
+from urllib.parse import urlencode
+from uuid import uuid4
 
 import click
 from click_alias import ClickAliasedGroup
 from click_didyoumean import DYMGroup
 import click_help_colors
+import click_spinner
 import emoji
 from mixpanel import Mixpanel
 from raven import Client
@@ -29,7 +32,6 @@ else:
 data = None
 home = os.path.expanduser('~/.asyncy')
 token = None
-
 
 
 def track(message, extra={}):
@@ -53,7 +55,7 @@ def write(content: str, location: str):
         file.write(content)
 
 
-def user():
+def user() -> dict:
     """
     Get the active user
     """
@@ -65,29 +67,42 @@ def user():
             'Hi! Thank you for using ' +
             click.style('Λsyncy', fg='magenta')
         )
-        click.echo('Please login to get started.')
-        email = click.prompt(click.style('Email', fg='magenta'),
-                             type=str)
-        password = click.prompt(click.style('Password', fg='magenta'),
-                                type=str, hide_input=True)
-        res = requests.post(
-            'https://alpha.asyncy.com/login',
-            data=json.dumps({'email': email, 'password': password})
-        )
-        if res.status_code == 200:
-            write(res.text, f'{home}/.config')
-            write('', f'{home}/.history')
-            init()
-            click.echo(
-                emoji.emojize(':waving_hand:') +
-                f'  Welcome {data["user"]["name"]}.'
-            )
-            track('Logged into CLI')
-            return data['user']
+        click.echo('Please login with GitHub to get started.')
 
-        else:
-            click.echo('Sorry, failed to login. Please try again.')
-            sys.exit(1)
+        state = uuid4()
+
+        query = {
+            'client_id': 'b9b8f0b3023105c45d8a',
+            'scope': 'read:user',
+            'state': state,
+            'redirect_uri': 'https://login.asyncy.com/oauth_success'
+        }
+        click.launch(
+            f'https://github.com/login/oauth/authorize?{urlencode(query)}'
+        )
+
+        with click_spinner.spinner():
+            while True:
+                try:
+                    url = 'https://login.asyncy.com/oauth_callback'
+                    res = requests.get(f'{url}?state={state}')
+                    res.raise_for_status()
+                    write(res.text, f'{home}/.config')
+                    init()
+                    click.echo(
+                        emoji.emojize(':waving_hand:') +
+                        f'  Welcome {data["user"]["name"]}.'
+                    )
+                    track('Logged into CLI')
+                    return data['user']
+
+                except requests.exceptions.ConnectTimeout:
+                    # just try again
+                    pass
+
+                except KeyboardInterrupt:
+                    click.echo('Login failed. Please try again.')
+                    sys.exit(1)
 
 
 def init():
