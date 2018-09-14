@@ -55,8 +55,8 @@ def apps_create(name, team):
     try:
         assert cli.run('git status 2&>1')
     except:
-        click.echo('Please create your application \
-                    from a git-backed project folder.')
+        click.echo('Please create your application '
+                   'from a git-backed project folder.')
         click.echo(click.style('$ git init', bold=True, fg='magenta'))
         sys.exit(1)
 
