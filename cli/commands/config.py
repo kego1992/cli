@@ -84,11 +84,11 @@ def config_set(variables, app, message):
             # TODO validate against a regexp pattern
             if '.' in key:
                 service, key = tuple(key.split('.', 1))
-                config.setdefault(service.lower(), {})[key.upper()] = val
+                config.setdefault(service.lower(), {})[key] = val
             else:
-                config[key.upper()] = val
+                config[key] = val
 
-            click.echo(click.style(key.upper(), fg='green') + f':  {val}')
+            click.echo(click.style(key, fg='green') + f':  {val}')
 
         click.echo('\nSettting config and deploying new release... ', nl=False)
         with click_spinner.spinner():
@@ -122,21 +122,21 @@ def config_get(variables):
         for name in variables:
             if '.' in name:
                 service, name = tuple(name.split('.', 1))
-                value = config[service.lower()].get(name.upper(), None)
+                value = config[service.lower()].get(name, None)
             else:
                 if name in config:
                     # could be a service here
                     value = config[name]
                 else:
-                    value = config.get(name.upper(), None)
+                    value = config.get(name, None)
 
             if value:
                 if isinstance(value, dict):
                     for name, value in value.items():
-                        click.echo(click.style(name.upper(), fg='green') +
+                        click.echo(click.style(name, fg='green') +
                                    f':  {value}')
                 else:
-                    click.echo(click.style(name.upper(), fg='green') +
+                    click.echo(click.style(name, fg='green') +
                                f':  {value}')
     else:
         click.echo(config_get.__doc__.strip())
@@ -144,6 +144,9 @@ def config_get(variables):
 
 @cli.cli.command(aliases=['config:del'])
 @click.argument('variables', nargs=-1)
+
+
+
 @click.option('--message', '-m', nargs=1, default=None,
               help='(optional) Message why variable(s) were deleted.')
 @options.app
@@ -170,10 +173,10 @@ def config_del(variables, app, message):
 
             elif '.' in key:
                 service, key = tuple(key.split('.', 1))
-                if service in config and key.upper() in config[service]:
-                    config[service].pop(key.upper())
+                if service in config and key in config[service]:
+                    config[service].pop(key)
                     click.echo(click.style('Removed', fg='red') +
-                               f': {key.upper()}')
+                               f': {key}')
 
         click.echo('\nSettting config and deploying new release... ', nl=False)
         with click_spinner.spinner():
