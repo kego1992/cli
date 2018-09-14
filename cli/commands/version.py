@@ -2,8 +2,6 @@
 
 import click
 
-import storyscript
-
 from .. import cli
 
 
@@ -12,9 +10,11 @@ def version():
     """
     Show version number
     """
+    from storyscript import version
+
     click.echo(
         click.style('Λsyncy', fg='magenta') + ' ' +
         cli.version + click.style(' - ', dim=True) +
         click.style('Storyscript', fg='cyan') + ' ' +
-        storyscript.version
+        version
     )
