@@ -138,6 +138,9 @@ def config_get(variables, app):
                 else:
                     click.echo(click.style(name, fg='green') +
                                f':  {value}')
+            else:
+                click.echo(click.style(f'No variable named "{name}".',
+                                       fg='red'))
     else:
         click.echo(config_get.__doc__.strip())
 
