@@ -147,9 +147,6 @@ def config_get(variables, app):
 
 @cli.cli.command(aliases=['config:del'])
 @click.argument('variables', nargs=-1)
-
-
-
 @click.option('--message', '-m', nargs=1, default=None,
               help='(optional) Message why variable(s) were deleted.')
 @options.app
