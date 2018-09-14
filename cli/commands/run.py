@@ -262,7 +262,6 @@ def run():
     Write Storyscript interactively
     """
     cli.user()
-    assert cli.running()
 
     click.echo(
         click.style('Λsyncy', fg='magenta') + ' ' +
