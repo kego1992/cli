@@ -1,4 +1,15 @@
 http server as client
+    when client listen path:'/github' as request
+        state = request.arguments['state']  # cli generated
+        scope = request.arguments['scope']
+        request redirect url:'https://github.com/login/oauth/authorize'
+                         query:{
+                            'state': state,
+                            'scope': scope,
+                            'client_id': app.secrets.github_client_id,
+                            'redirect_uri': 'https://login.asyncy.com/github/oauth_success'
+                         }
+
     # Postback URL for the GH oauth, initiated via the CLI
     # The URL should look something like this - https://login.asyncy.com/oauth_success
     when client listen path:'/github/oauth_success' as request

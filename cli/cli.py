@@ -72,13 +72,11 @@ def user() -> dict:
         state = uuid4()
 
         query = {
-            'client_id': 'b9b8f0b3023105c45d8a',
             'scope': 'read:user',
-            'state': state,
-            'redirect_uri': 'https://login.asyncy.com/oauth_success'
+            'state': state
         }
         click.launch(
-            f'https://github.com/login/oauth/authorize?{urlencode(query)}'
+            f'https://login.asyncy.com/github?{urlencode(query)}'
         )
 
         with click_spinner.spinner():
