@@ -106,7 +106,7 @@ def config_set(variables, app, message):
 @cli.cli.command(aliases=['config:get'])
 @click.argument('variables', nargs=-1)
 @options.app
-def config_get(variables):
+def config_get(variables, app):
     """
     Get one or more environment variables
     """
@@ -116,7 +116,7 @@ def config_get(variables):
 
         click.echo('Fetching config... ', nl=False)
         with click_spinner.spinner():
-            config = api.Config.get()
+            config = api.Config.get(app=app)
         click.echo(click.style('√', fg='green'))
 
         for name in variables:
