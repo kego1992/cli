@@ -84,11 +84,11 @@ def config_set(variables, app, message):
             # TODO validate against a regexp pattern
             if '.' in key:
                 service, key = tuple(key.split('.', 1))
-                config.setdefault(service.lower(), {})[key] = val
+                config.setdefault(service.lower(), {})[key.upper()] = val
             else:
-                config[key] = val
+                config[key.upper()] = val
 
-            click.echo(click.style(key, fg='green') + f':  {val}')
+            click.echo(click.style(key.upper(), fg='green') + f':  {val}')
 
         click.echo('\nSettting config and deploying new release... ', nl=False)
         with click_spinner.spinner():
@@ -122,24 +122,24 @@ def config_get(variables, app):
         for name in variables:
             if '.' in name:
                 service, name = tuple(name.split('.', 1))
-                value = config[service.lower()].get(name, None)
+                value = config[service.lower()].get(name.upper(), None)
             else:
                 if name in config:
                     # could be a service here
                     value = config[name]
                 else:
-                    value = config.get(name, None)
+                    value = config.get(name.upper(), None)
 
             if value:
                 if isinstance(value, dict):
                     for name, value in value.items():
-                        click.echo(click.style(name, fg='green') +
+                        click.echo(click.style(name.upper(), fg='green') +
                                    f':  {value}')
                 else:
-                    click.echo(click.style(name, fg='green') +
+                    click.echo(click.style(name.upper(), fg='green') +
                                f':  {value}')
             else:
-                click.echo(click.style(f'No variable named "{name}".',
+                click.echo(click.style(f'No variable named "{name.upper()}".',
                                        fg='red'))
     else:
         click.echo(config_get.__doc__.strip())
@@ -167,21 +167,27 @@ def config_del(variables, app, message):
         click.echo(click.style('√', fg='green'))
 
         for key in variables:
+            removed = False
             if key in config:
                 if type(config.pop(key)) is dict:
                     click.echo(click.style('Removed service',
                                            fg='red') + f': {key}')
                 else:
-                    click.echo(click.style('Removed', fg='red') + f': {key}')
-
+                    removed = True
+            elif key.upper() in config:
+                config.pop(key.upper())
+                removed = True
             elif '.' in key:
                 service, key = tuple(key.split('.', 1))
-                if service in config and key in config[service]:
-                    config[service].pop(key)
-                    click.echo(click.style('Removed', fg='red') +
-                               f': {key}')
+                if service in config and key.upper() in config[service]:
+                    config[service].pop(key.upper())
+                    removed = True
 
-        click.echo('\nSettting config and deploying new release... ', nl=False)
+            if removed:
+                click.echo(
+                    click.style('Removed', fg='red') + f': {key.upper()}')
+
+        click.echo('\nSetting config and deploying new release... ', nl=False)
         with click_spinner.spinner():
             release = api.Config.set(config=config, app=app, message=message)
         click.echo(click.style('√', fg='green'))
