@@ -31,7 +31,6 @@ keywords = [
 requirements = [
     'asyncio==3.4.3',
     'click-alias==0.1.1a1',
-    'click-didyoumean==0.0.3',
     'click-help-colors==0.4',
     'click-spinner==0.1.8',
     'click==6.7',

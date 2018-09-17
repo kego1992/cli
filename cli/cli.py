@@ -9,7 +9,6 @@ from uuid import uuid4
 
 import click
 from click_alias import ClickAliasedGroup
-from click_didyoumean import DYMGroup
 import click_help_colors
 import click_spinner
 import emoji
@@ -17,6 +16,7 @@ from mixpanel import Mixpanel
 from raven import Client
 import requests
 
+from .helpers.didyoumean import DYMGroup
 from .version import version
 
 
