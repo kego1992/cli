@@ -27,22 +27,20 @@ http server as client
         # https://developer.github.com/v3/users/#get-the-authenticated-user
         user = github api endpoint:'/user' token:token.data['access_token']
 
-        res = graphql exec
-            query:'mutation($data:CreateOwnerByLoginInput!){createOwnerByLogin(input:$data){uuid}}'
-            data:{
-              'data': {
-                'service': 'GITHUB',
-                'serviceId': user.service_id,
-                'username': user.login,
-                'name': user.name,
-                'email': user.email,
-                'oauthToken': token.data['access_token']
-              }
-            }
+        res = psql exec
+          query:'select create_owner_by_login({service}, {service_id}, {username}, {name}, {email}, {oauth_token}) as data;'
+          data:{
+            'service': 'GITHUB',
+            'service_id': user.service_id,
+            'username': user.login,
+            'name': user.name,
+            'email': user.email,
+            'oauth_token': token.data['access_token']
+          }
 
         redis rpush key:state value:{
-            'id': res['data']['createownerbylogin']['json']['owner_uuid'],
-            'access_token': res['data']['createownerbylogin']['json']['token_uuid'],
+            'id': res[0]['data']['owner_uuid'],
+            'access_token': res[0]['data']['token_uuid'],
             'name': user.name,
             'email': user.email,
             'username': user.login
