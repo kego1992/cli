@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-import os
+import pkgutil
 
 import click
 import emoji
@@ -20,9 +19,8 @@ def bootstrap(story):
     """
     cli.track('Bootstrap story')
     if story != '-':
-        with open(os.path.join(os.path.dirname(__file__),
-                               f'../stories/{story}.story'), 'r') as file:
-            click.echo(file.read())
+        data = pkgutil.get_data('cli', f'stories/{story}.story')
+        click.echo(data)
 
     else:
         click.echo(click.style('Choose a template', bold=True))

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import json
 import os
 import sys
 
@@ -20,7 +20,7 @@ def test(debug):
     cli.track('Test Stories')
     click.echo(click.style('Compiling Stories', bold=True))
     try:
-        stories = App.compile(os.getcwd(), debug=debug)
+        stories = json.loads(App.compile(os.getcwd(), debug=debug))
     except Exception as e:
         cli.track('Stories failed')
         cli.sentry.captureException()
