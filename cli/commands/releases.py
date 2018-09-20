@@ -40,7 +40,7 @@ def releases(app, limit):
                 ))
             )
     else:
-        click.echo('No releases yet.')
+        click.echo(f'No releases yet for app "{app}".')
 
 
 @cli.cli.command(aliases=['releases:rollback'])

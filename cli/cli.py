@@ -43,6 +43,27 @@ def track(message, extra={}):
         pass
 
 
+def find_asyncy_yml():
+    current_dir = os.getcwd()
+    while True:
+        if os.path.exists(f'{current_dir}{os.path.sep}asyncy.yml'):
+            return f'{current_dir}/asyncy.yml'
+        elif current_dir == os.path.dirname(current_dir):
+            break
+        else:
+            current_dir = os.path.dirname(current_dir)
+
+    return None
+
+
+def get_app_name() -> str:
+    file = find_asyncy_yml()
+    assert file is not None
+    import yaml
+    with open(file, 'r') as s:
+        return yaml.load(s).pop('app_name')
+
+
 def write(content: str, location: str):
     dir = os.path.dirname(location)
     if dir and not os.path.exists(dir):

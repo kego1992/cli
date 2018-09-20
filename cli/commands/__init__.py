@@ -7,9 +7,9 @@ __all__ = [
     'logs',
     'maintenance',
     'releases',
-    'run',
     'status',
     'test',
     'update',
     'version',
+    'deploy'
 ]
