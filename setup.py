@@ -40,7 +40,7 @@ requirements = [
     'Pygments==2.2.0',
     'raven==6.9.0',
     'requests==2.19.1',
-    'storyscript>=0.5.0',
+    'storyscript==0.5.1',
     'websockets==6.0',
 ]
 
