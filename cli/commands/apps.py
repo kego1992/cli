@@ -30,7 +30,9 @@ def apps():
     with click_spinner.spinner():
         res = api.Apps.list()
 
+    count = 0
     for app in res:
+        count += 1
         click.echo(
             '\t'.join((
                 click.style(app['name'], bold=True),
@@ -41,6 +43,10 @@ def apps():
                 )
             ))
         )
+
+    if count == 0:
+        click.echo('No application found. Create your first app with')
+        click.echo(click.style('$ asyncy apps:create', fg='magenta'))
 
 
 def _is_git_repo_good():
