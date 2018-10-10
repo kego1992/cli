@@ -28,10 +28,10 @@ brew update
 brew install Formula/asyncy.rb
 asyncy version | grep $tag
 asyncy --help
-cd homebrew-brew
 git checkout -b release_$tag
 git commit -a -m "Release $tag."
 git push origin release_$tag
 echo "Branch release_$tag created. Please open a PR and have it accepted."
 
+cd ../..
 rm -rf $BUILD_DIR
