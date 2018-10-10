@@ -4,6 +4,7 @@ import os
 import sys
 
 import click
+
 import emoji
 
 from .. import cli

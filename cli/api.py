@@ -3,7 +3,9 @@
 import os
 import sys
 from json import dumps
+
 import click
+
 import requests
 
 from . import cli

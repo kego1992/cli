@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import subprocess
 import sys
+
 import click
+
 import click_spinner
+
 import emoji
 
 from .. import api

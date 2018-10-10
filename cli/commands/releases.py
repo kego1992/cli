@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import sys
-import click
-import click_spinner
 
+import click
+
+import click_spinner
 
 from .. import api
 from .. import cli

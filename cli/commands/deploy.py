@@ -3,10 +3,12 @@ import json
 import os
 
 import click
+
 import click_spinner
+
 from storyscript.app import App
 
-from cli import cli, options
+from .. import cli, options
 from ..api import Config, Releases
 
 

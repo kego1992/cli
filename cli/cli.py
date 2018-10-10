@@ -8,12 +8,19 @@ from urllib.parse import urlencode
 from uuid import uuid4
 
 import click
+
 from click_alias import ClickAliasedGroup
+
 import click_help_colors
+
 import click_spinner
+
 import emoji
+
 from mixpanel import Mixpanel
+
 from raven import Client
+
 import requests
 
 from .helpers.didyoumean import DYMGroup
