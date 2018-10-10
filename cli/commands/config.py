@@ -91,7 +91,7 @@ def config_set(variables, app, message):
 
             click.echo(click.style(key.upper(), fg='green') + f':  {val}')
 
-        click.echo('\nSettting config and deploying new release... ', nl=False)
+        click.echo('\nSetting config and deploying new release... ', nl=False)
         with click_spinner.spinner():
             release = api.Config.set(config=config, app=app, message=message)
         click.echo(click.style('√', fg='green'))
