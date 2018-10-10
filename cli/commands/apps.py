@@ -87,7 +87,7 @@ def apps_create(name, team):
     asyncy_yaml = cli.find_asyncy_yml()
     if asyncy_yaml is not None:
         click.echo(
-            click.style('There appears to be an Asyncy project in  '
+            click.style('There appears to be an Asyncy project in '
                         f'{asyncy_yaml} already.\n', fg='red'))
         click.echo(
             click.style('Are you trying to deploy? '
