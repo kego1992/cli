@@ -160,8 +160,7 @@ class Releases:
                     'appUuid': Apps.get_uuid_from_hostname(app),
                     'message': message or 'Deploy app',
                     'config': config,
-                    'payload': payload,
-                    'ownerUuid': cli.data['id']
+                    'payload': payload
                 }
             }
         )
