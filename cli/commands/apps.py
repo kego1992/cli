@@ -91,7 +91,8 @@ def apps_create(name, team):
                         f'{asyncy_yaml} already.\n', fg='red'))
         click.echo(
             click.style('Are you trying to deploy? '
-                        'Try $ asyncy deploy to deploy.\n', fg='red'))
+                        'Try the following:', fg='red'))
+        click.echo(click.style('$ asyncy deploy', fg='magenta'))
         sys.exit(1)
     # _is_git_repo_good()
 
