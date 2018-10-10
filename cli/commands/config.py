@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import click
+
 import click_spinner
 
 from .. import api

@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import subprocess
 import sys
+
 import click
+
 import click_spinner
+
 import emoji
 
 from .. import api
@@ -30,7 +33,9 @@ def apps():
     with click_spinner.spinner():
         res = api.Apps.list()
 
+    count = 0
     for app in res:
+        count += 1
         click.echo(
             '\t'.join((
                 click.style(app['name'], bold=True),
@@ -41,6 +46,10 @@ def apps():
                 )
             ))
         )
+
+    if count == 0:
+        click.echo('No application found. Create your first app with')
+        click.echo(click.style('$ asyncy apps:create', fg='magenta'))
 
 
 def _is_git_repo_good():
@@ -78,7 +87,17 @@ def apps_create(name, team):
     """
     cli.user()
     cli.track('Creating application')
-    _is_git_repo_good()
+    asyncy_yaml = cli.find_asyncy_yml()
+    if asyncy_yaml is not None:
+        click.echo(
+            click.style('There appears to be an Asyncy project in '
+                        f'{asyncy_yaml} already.\n', fg='red'))
+        click.echo(
+            click.style('Are you trying to deploy? '
+                        'Try the following:', fg='red'))
+        click.echo(click.style('$ asyncy deploy', fg='magenta'))
+        sys.exit(1)
+    # _is_git_repo_good()
 
     name = name or awesome.new()
 
@@ -87,8 +106,12 @@ def apps_create(name, team):
         api.Apps.create(name=name, team=team)
     click.echo(click.style('√', fg='green'))
 
-    click.echo('Adding git-remote... ', nl=False)
-    cli.run(f'git remote add asyncy https://git.asyncy.com/{name}')
+    # click.echo('Adding git-remote... ', nl=False)
+    # cli.run(f'git remote add asyncy https://git.asyncy.com/{name}')
+    # click.echo(click.style('√', fg='green'))
+    click.echo('Creating asyncy.yml...', nl=False)
+    cli.write(f'app_name: {name}\n', 'asyncy.yml')
+
     click.echo(click.style('√', fg='green'))
 
     click.echo('\nNew application name: ' + click.style(name, bold=True))
@@ -103,19 +126,10 @@ def apps_create(name, team):
         '  You are ready to build your first Asyncy App'
     )
     click.echo('- [ ] Write some stories')
-    click.echo(
-        '- [ ] ' +
-        click.style('$ git add . && git commit -m "initial commit"',
-                    fg='magenta')
-    )
-    click.echo(
-        '- [ ] ' +
-        click.style('$ git push asyncy master', fg='magenta')
-    )
+    click.echo('- [ ] ' + click.style('$ asyncy deploy', fg='magenta'))
     click.echo(
         click.style('\nHINT:', fg='cyan') + ' run ' +
-        click.style('$ asyncy bootstrap', fg='magenta') +
-        ' for examples'
+        click.style('$ asyncy bootstrap', fg='magenta') + ' for examples'
     )
 
 

@@ -3,7 +3,9 @@
 import os
 import sys
 from json import dumps
+
 import click
+
 import requests
 
 from . import cli
@@ -25,7 +27,7 @@ def graphql(query, **variables):
         headers={
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authentication': f'Bearer {cli.data["access_token"]}'
+            'Authorization': f'Bearer {cli.data["access_token"]}'
         }
     )
     data = res.json()
@@ -59,25 +61,8 @@ class Config:
 
     @staticmethod
     def set(config: {}, app: str, message: str) -> dict:
-        res = graphql(
-            """
-            mutation ($data: CreateReleaseInput!){
-              createRelease(input: $data) {
-                release { id }
-              }
-            }
-            """,
-            data={
-                'release': {
-                    'appUuid': Apps.get_uuid_from_hostname(app),
-                    'message': message or 'Update environment',
-                    'config': config,
-                    'payload': {},
-                    'ownerUuid': cli.data['id']
-                }
-            }
-        )
-        return res['data']['createRelease']['release']
+        return Releases.create(config, None, app,
+                               message or 'Update environment')
 
 
 class Releases:
@@ -161,6 +146,27 @@ class Releases:
             return res['data']['allReleases']['nodes']
         except:
             return []
+
+    @staticmethod
+    def create(config: {}, payload: {}, app: str, message: str) -> dict:
+        res = graphql(
+            """
+            mutation ($data: CreateReleaseInput!){
+              createRelease(input: $data) {
+                release { id }
+              }
+            }
+            """,
+            data={
+                'release': {
+                    'appUuid': Apps.get_uuid_from_hostname(app),
+                    'message': message or 'Deploy app',
+                    'config': config,
+                    'payload': payload
+                }
+            }
+        )
+        return res['data']['createRelease']['release']
 
 
 class Apps:

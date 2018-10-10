@@ -2,6 +2,7 @@
 import pkgutil
 
 import click
+
 import emoji
 
 from .. import cli

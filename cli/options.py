@@ -6,7 +6,8 @@ from .cli import run
 
 
 try:
-    _app = run('git remote get-url asyncy').split('/')[3]
+    from . import cli
+    _app = cli.get_app_name()
 except:
     _app = None
 

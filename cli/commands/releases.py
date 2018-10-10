@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import sys
-import click
-import click_spinner
 
+import click
+
+import click_spinner
 
 from .. import api
 from .. import cli
@@ -40,7 +41,7 @@ def releases(app, limit):
                 ))
             )
     else:
-        click.echo('No releases yet.')
+        click.echo(f'No releases yet for app "{app}".')
 
 
 @cli.cli.command(aliases=['releases:rollback'])

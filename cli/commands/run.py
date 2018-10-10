@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import click
+
 import emoji
 
 from .. import cli
