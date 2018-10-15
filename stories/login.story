@@ -1,52 +1,40 @@
 http server as client
-    when client listen path:'/github' as request
-        state = request.arguments['state']  # cli generated
-        scope = request.arguments['scope']
-        request redirect url:'https://github.com/login/oauth/authorize'
-                         query:{
-                            'state': state,
-                            'scope': scope,
-                            'client_id': app.secrets.github_client_id,
-                            'redirect_uri': 'https://login.asyncy.com/github/oauth_success'
-                         }
+    when client listen path: '/github' as request
+        state = request.query_params['state']  # cli generated
+        redirect_url = 'https://login.asyncyapp.com/github/oauth_success'
+        request redirect url: 'https://github.com/login/oauth/authorize' query: {'scope': 'user:email', 'state': state, 'client_id': app.secrets.github_client_id, 'redirect_uri': redirect_url}
 
     # Postback URL for the GH oauth, initiated via the CLI
-    # The URL should look something like this - https://login.asyncy.com/oauth_success
+    # The URL should look something like this - https://login.asyncyapp.com/github/oauth_success
     when client listen path:'/github/oauth_success' as request
-        state = request.arguments['state']  # cli generated
-        code = request.arguments['code']  # gh auth code
-        body = {
-            'client_id': app.secrets.github_client_id,
-            'client_secret': app.secrets.github_client_secret,
-            'code': code,
-            'state': state
-        }
-        token = http fetch path:'https://github.com/login/oauth/access_token'
-                           method:'post' :body
+        state = request.query_params['state']  # cli generated
+        code = request.query_params['code']  # gh auth code
 
-        # https://developer.github.com/v3/users/#get-the-authenticated-user
-        user = github api endpoint:'/user' token:token.data['access_token']
+        # Get the oauth_token.
+        body = {'client_id': app.secrets.github_client_id, 'client_secret': app.secrets.github_client_secret, 'code': code, 'state': state}
+        headers = {'Content-Type': 'application/json; charset=utf-8', 'Accept': 'application/json'}
+        gh_response = http fetch url: 'https://github.com/login/oauth/access_token' method: 'post' body: body headers: headers
+        token = gh_response['access_token']
 
-        res = psql exec
-          query:'select create_owner_by_login({service}, {service_id}, {username}, {name}, {email}, {oauth_token}) as data;'
-          data:{
-            'service': 'GITHUB',
-            'service_id': user.service_id,
-            'username': user.login,
-            'name': user.name,
-            'email': user.email,
-            'oauth_token': token.data['access_token']
-          }
+        log info msg: token
+        headers = {'Authorization': 'bearer {token}'}
+        user = http fetch url: 'https://api.github.com/user' headers: headers
 
-        redis rpush key:state value:{
-            'id': res[0]['data']['owner_uuid'],
-            'access_token': res[0]['data']['token_uuid'],
-            'name': user.name,
-            'email': user.email,
-            'username': user.login
-        }
+        # Insert into postgres.
+        service_id = user['id']
+        creds_raw = psql exec query: 'select create_owner_by_login(%(service)s, %(service_id)s, %(username)s, %(name)s, %(email)s, %(oauth_token)s) as data' data: {'service': 'github', 'service_id': '{service_id}', 'username': user['login'], 'name': user['name'], 'email': user['email'], 'oauth_token': token}
+        log info msg: creds_raw
+        creds = creds_raw['results'][0]['data']
 
-    when client listen path:'/oauth_callback' as request
-        user_data = redis brpop key:request.arguments['state']  # cli generated uuid
-        request write content:user_data
+        # Push the state in Redis.
+        redis set key: state value: (json stringify content: {'id': creds['owner_uuid'], 'access_token': creds['token_uuid'], 'name': user['name'], 'email': user['email'], 'username': user['login']})
+        redis expire key: state seconds: 3600  # One hour.
+        request set_header key: 'Content-Type' value: 'text/html; charset=utf-8'
+        request write content: '<!DOCTYPE html> <html> <head>  <meta charset="UTF-8">  <title>Asyncy</title> </head> <body> <div style="width: 416px; margin: 0 auto;">  <h1 style="text-align: center;">Logged in!</h1>  <br>  <span style="text-align: center; display: block;">Head back to your terminal. The future awaits.<br>Cheers 🍻!</span>  <br>  <img src="https://judepereira.com/nocache/bot.svg" height=500/> </div> </body> </html> '
+
+    # The Asyncy CLI will long poll this endpoint to get login creds.
+    when client listen path:'/github/oauth_callback' as request
+        user_data = redis get key: request.query_params['state']  # CLI generated uuid.
+        request set_header key: 'Content-Type' value: 'application/json; charset=utf-8'
+        request write content: user_data['result']
         request finish
