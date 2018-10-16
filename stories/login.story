@@ -26,8 +26,13 @@ http server as client
         log info msg: creds_raw
         creds = creds_raw['results'][0]['data']
 
+        # Get the token secret.
+        secret_raw = psql exec query: 'select secret from token_secrets where token_uuid=%(token_uuid)s' data: {'token_uuid': creds['token_uuid']}
+        log info msg: 'secret_raw is {secret_raw}'
+        token_secret = secret_raw['results'][0]['secret']
+
         # Push the state in Redis.
-        redis set key: state value: (json stringify content: {'id': creds['owner_uuid'], 'access_token': creds['token_uuid'], 'name': user['name'], 'email': user['email'], 'username': user['login']})
+        redis set key: state value: (json stringify content: {'id': creds['owner_uuid'], 'access_token': token_secret, 'name': user['name'], 'email': user['email'], 'username': user['login']})
         redis expire key: state seconds: 3600  # One hour.
         request set_header key: 'Content-Type' value: 'text/html; charset=utf-8'
         request write content: '<!DOCTYPE html> <html> <head>  <meta charset="UTF-8">  <title>Asyncy</title> </head> <body> <div style="width: 416px; margin: 0 auto;">  <h1 style="text-align: center;">Logged in!</h1>  <br>  <span style="text-align: center; display: block;">Head back to your terminal. The future awaits.<br>Cheers 🍻!</span>  <br>  <img src="https://judepereira.com/nocache/bot.svg" height=500/> </div> </body> </html> '
@@ -38,3 +43,4 @@ http server as client
         request set_header key: 'Content-Type' value: 'application/json; charset=utf-8'
         request write content: user_data['result']
         request finish
+
