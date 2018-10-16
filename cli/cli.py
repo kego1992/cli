@@ -4,6 +4,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from urllib.parse import urlencode
 from uuid import uuid4
 
@@ -93,25 +94,28 @@ def user() -> dict:
     else:
         click.echo(
             'Hi! Thank you for using ' +
-            click.style('Λsyncy', fg='magenta')
+            click.style('Λsyncy', fg='magenta') + '.'
         )
         click.echo('Please login with GitHub to get started.')
 
         state = uuid4()
 
         query = {
-            'scope': 'read:user',
             'state': state
         }
         click.launch(
-            f'https://login.asyncy.com/github?{urlencode(query)}'
+            f'https://login.asyncyapp.com/github?{urlencode(query)}'
         )
 
         with click_spinner.spinner():
             while True:
                 try:
-                    url = 'https://login.asyncy.com/oauth_callback'
+                    url = 'https://login.asyncyapp.com/github/oauth_callback'
                     res = requests.get(f'{url}?state={state}')
+
+                    if res.text == 'null':
+                        raise IOError()
+
                     res.raise_for_status()
                     write(res.text, f'{home}/.config')
                     init()
@@ -122,7 +126,8 @@ def user() -> dict:
                     track('Logged into CLI')
                     return data
 
-                except requests.exceptions.ConnectTimeout:
+                except IOError:
+                    time.sleep(0.5)
                     # just try again
                     pass
 
