@@ -103,9 +103,15 @@ def user() -> dict:
         query = {
             'state': state
         }
-        click.launch(
-            f'https://login.asyncyapp.com/github?{urlencode(query)}'
-        )
+
+        url = f'https://login.asyncyapp.com/github?{urlencode(query)}'
+
+        click.launch(url)
+        click.echo()
+        click.echo('Visit this link if your browser '
+                   'doesn\'t open automatically:')
+        click.echo(url)
+        click.echo()
 
         with click_spinner.spinner():
             while True:
@@ -119,21 +125,29 @@ def user() -> dict:
                     res.raise_for_status()
                     write(res.text, f'{home}/.config')
                     init()
-                    click.echo(
-                        emoji.emojize(':waving_hand:') +
-                        f'  Welcome {data["name"]}.'
-                    )
-                    track('Logged into CLI')
-                    return data
-
+                    break
                 except IOError:
                     time.sleep(0.5)
                     # just try again
                     pass
-
                 except KeyboardInterrupt:
                     click.echo('Login failed. Please try again.')
                     sys.exit(1)
+        click.echo(
+            emoji.emojize(':waving_hand:') +
+            f'  Welcome {data["name"]}!'
+        )
+        click.echo()
+        click.echo('You may create or list your apps with:')
+        print_command('asyncy apps')
+
+        click.echo()
+        track('Logged into CLI')
+        return data
+
+
+def print_command(command):
+    click.echo(click.style(f'$ {command}', fg='magenta'))
 
 
 def init():
