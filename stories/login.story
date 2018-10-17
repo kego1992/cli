@@ -16,19 +16,16 @@ http server as client
         gh_response = http fetch url: 'https://github.com/login/oauth/access_token' method: 'post' body: body headers: headers
         token = gh_response['access_token']
 
-        log info msg: token
         headers = {'Authorization': 'bearer {token}'}
         user = http fetch url: 'https://api.github.com/user' headers: headers
 
         # Insert into postgres.
         service_id = user['id']
         creds_raw = psql exec query: 'select create_owner_by_login(%(service)s, %(service_id)s, %(username)s, %(name)s, %(email)s, %(oauth_token)s) as data' data: {'service': 'github', 'service_id': '{service_id}', 'username': user['login'], 'name': user['name'], 'email': user['email'], 'oauth_token': token}
-        log info msg: creds_raw
         creds = creds_raw['results'][0]['data']
 
         # Get the token secret.
         secret_raw = psql exec query: 'select secret from token_secrets where token_uuid=%(token_uuid)s' data: {'token_uuid': creds['token_uuid']}
-        log info msg: 'secret_raw is {secret_raw}'
         token_secret = secret_raw['results'][0]['secret']
 
         # Push the state in Redis.
