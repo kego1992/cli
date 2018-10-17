@@ -9,6 +9,6 @@ from .. import cli
 def login():
     cli.user()
     click.echo(
-        'You are logged in as ' +
+        'You\'re logged in as ' +
         click.style(cli.data['email'], fg='cyan')
     )
