@@ -16,6 +16,8 @@ from ..api import Config, Releases
 @click.option('--message', is_flag=True, help='Deployment message')
 @options.app
 def deploy(app, message):
+    cli.user()
+    cli.assert_project()
     click.echo(f'Deploying app {app}... ', nl=False)
     with click_spinner.spinner():
         config = Config.get(app)

@@ -150,6 +150,19 @@ def print_command(command):
     click.echo(click.style(f'$ {command}', fg='magenta'))
 
 
+def assert_project():
+    try:
+        name = get_app_name()
+        if not name:
+            raise Exception()
+    except:
+        click.echo(click.style('No Asyncy application found.', fg='red'))
+        click.echo()
+        click.echo('Create an application with:')
+        print_command('asyncy apps:create')
+        sys.exit(1)
+
+
 def init():
     global data
     if os.path.exists(f'{home}/.config'):

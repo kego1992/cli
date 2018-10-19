@@ -15,7 +15,10 @@ def maintenance(app):
     """
     Returns if the application is in maintenance mode.
     """
-    click.echo('Fetching maintenance mode... ', nl=False)
+    cli.user()
+    cli.assert_project()
+    click.echo(f'Fetching maintenance mode for {cli.get_app_name()}... ',
+               nl=False)
     with click_spinner.spinner():
         enabled = api.Apps.maintenance(app=app, maintenance=None)
     if enabled:
@@ -32,7 +35,10 @@ def maintenance_on(app):
     """
     Turns maintenance mode on.
     """
-    click.echo('Enabling maintenance mode... ', nl=False)
+    cli.user()
+    cli.assert_project()
+    click.echo(f'Enabling maintenance mode for app {cli.get_app_name()}... ',
+               nl=False)
     with click_spinner.spinner():
         app = api.Apps.maintenance(app=app, maintenance=True)
     click.echo(click.style('√', fg='green'))
@@ -46,7 +52,10 @@ def maintenance_off(app):
     """
     Turns maintenance mode off.
     """
-    click.echo('Disabling maintenance mode... ', nl=False)
+    cli.user()
+    cli.assert_project()
+    click.echo(f'Disabling maintenance mode for app {cli.get_app_name()}... ',
+               nl=False)
     with click_spinner.spinner():
         app = api.Apps.maintenance(app=app, maintenance=False)
     click.echo(click.style('√', fg='green'))
