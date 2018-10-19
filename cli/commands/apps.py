@@ -12,13 +12,14 @@ from .. import api
 from .. import awesome
 from .. import cli
 from .. import options
+from ..helpers.datetime import reltime
 
 
 def maintenance(enabled: bool) -> str:
     if enabled:
-        return click.style('maintenance mode enabled', fg='red')
+        return 'in maintenance'
     else:
-        return click.style('running', fg='green')
+        return 'running'
 
 
 @cli.cli.command()
@@ -26,30 +27,40 @@ def apps():
     """
     List your applications
     """
+    from texttable import Texttable
+    from datetime import datetime
     cli.user()
-    click.echo(click.style('Applications', fg='magenta'))
-    click.echo(click.style('============', fg='magenta'))
 
     with click_spinner.spinner():
         res = api.Apps.list()
 
     count = 0
+    # Heads up! Texttable does not like colours.
+    # So don't use click.style here.
+    table = Texttable(max_width=800)
+    table.set_deco(Texttable.HEADER)
+    table.set_cols_align(['l', 'l', 'l'])
+    all_apps = [['NAME', 'STATE', 'CREATED']]
     for app in res:
         count += 1
-        click.echo(
-            '\t'.join((
-                click.style(app['name'], bold=True),
-                maintenance(app['maintenance']),
-                (
-                    click.style('created:', dim=True) +
-                    click.style(app['timestamp'])
-                )
-            ))
-        )
+        ts = app['timestamp']
+        assert isinstance(ts, str)
+        # Replace the ":" in the timezone field for datetime.
+        datetime_ts = ts[0:ts.rindex(':')] + ts[ts.rindex(':') + 1:]
+        date = datetime.strptime(datetime_ts, '%Y-%m-%dT%H:%M:%S.%f%z')
+        all_apps.append([
+            app['name'],
+            maintenance(app['maintenance']),
+            reltime(date)
+        ])
+
+    table.add_rows(rows=all_apps)
 
     if count == 0:
         click.echo('No application found. Create your first app with')
         click.echo(click.style('$ asyncy apps:create', fg='magenta'))
+    else:
+        click.echo(table.draw())
 
 
 def _is_git_repo_good():

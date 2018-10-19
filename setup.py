@@ -42,6 +42,8 @@ requirements = [
     'requests==2.19.1',
     'storyscript==0.6.0',
     'websockets==6.0',
+    'texttable==1.4.0',
+    'pytz==2018.5'
 ]
 
 

@@ -11,3 +11,5 @@ raven==6.9.0
 requests==2.19.1
 pyyaml==3.13
 storyscript==0.6.0
+texttable==1.4.0
+pytz==2018.5
