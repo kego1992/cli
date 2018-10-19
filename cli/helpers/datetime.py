@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
-
-
-# https://gist.github.com/deontologician/3503910
-from datetime import datetime
 import math
+from datetime import datetime
 
 import pytz
 
 
+# https://gist.github.com/deontologician/3503910
 def reltime(date, compare_to=None, at='@'):
-    r'''Takes a datetime and returns a relative representation of the
+    """
+    Takes a datetime and returns a relative representation of the
     time.
     :param date: The date to render relatively
     :param compare_to: what to compare the date to. Defaults to datetime.now()
@@ -34,15 +33,17 @@ def reltime(date, compare_to=None, at='@'):
     >>> last_mon = datetime(2012, 8, 20, 15, 40, 55)
     >>> reltime(last_mon, today)
     'last Monday @ 3:40pm (9 days ago)'
-    '''
+    """
+
     def ordinal(n):
-        r'''Returns a string ordinal representation of a number
+        """
+        Returns a string ordinal representation of a number
         Taken from: http://stackoverflow.com/a/739301/180718
-        '''
+        """
         if 10 <= n % 100 < 20:
             return str(n) + 'th'
         else:
-            return str(n) + {1 : 'st', 2 : 'nd', 3 : 'rd'}.get(n % 10, "th")
+            return str(n) + {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')
 
     compare_to = compare_to or pytz.UTC.localize(datetime.now())
     if date > compare_to:
@@ -71,7 +72,7 @@ def reltime(date, compare_to=None, at='@'):
         datestr = 'today {at} {time}'
     elif days_ago == 1:
         datestr = 'yesterday {at} {time}'
-    elif (wd in (5, 6) and days_ago in (wd+1, wd+2)) or \
+    elif (wd in (5, 6) and days_ago in (wd + 1, wd + 2)) or \
             wd + 3 <= days_ago <= wd + 8:
         # this was determined by making a table of wd versus days_ago and
         # divining a relationship based on everyday speech. This is somewhat
@@ -88,7 +89,7 @@ def reltime(date, compare_to=None, at='@'):
     elif months_ago > 1:
         datestr = '{month} {day} {at} {time} ({months_ago} months ago)'
     else:
-        #not last week, but not last month either
+        # not last week, but not last month either
         datestr = '{month} {day} {at} {time} ({days_ago} days ago)'
     return datestr.format(time=time,
                           weekday=date.strftime('%A'),
