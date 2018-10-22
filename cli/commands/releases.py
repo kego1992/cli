@@ -8,6 +8,7 @@ import click_spinner
 from .. import api
 from .. import cli
 from .. import options
+from ..helpers.datetime import parse_psql_date_str, reltime
 
 
 @cli.cli.command()
@@ -25,22 +26,27 @@ def releases(app, limit):
     cli.user()
     cli.assert_project()
 
-    click.echo(click.style('Releases', fg='magenta'))
-    click.echo(click.style('========', fg='magenta'))
+    # click.echo(click.style('Releases', fg='magenta'))
+    # click.echo(click.style('========', fg='magenta'))
 
     with click_spinner.spinner():
         res = api.Releases.list(app, limit=limit)
 
     if res:
+        from texttable import Texttable
+        table = Texttable(max_width=800)
+        table.set_deco(Texttable.HEADER)
+        table.set_cols_align(['l', 'l', 'l'])
+        all_releases = [['VERSION', 'CREATED', 'MESSAGE']]
         for release in res:
-            click.echo(
-                '\t'.join((
-                    click.style(f'v{release["id"]}', bold=True),
-                    click.style('created:', dim=True) +
-                    click.style(release['timestamp']),
-                    click.style(release['message'], fg='blue'),
-                ))
-            )
+            date = parse_psql_date_str(release['timestamp'])
+            all_releases.append([
+                f'v{release["id"]}',
+                reltime(date),
+                release['message']
+            ])
+        table.add_rows(rows=all_releases)
+        click.echo(table.draw())
     else:
         click.echo(f'No releases yet for app {app}.')
 
