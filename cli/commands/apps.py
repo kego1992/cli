@@ -12,7 +12,7 @@ from .. import api
 from .. import awesome
 from .. import cli
 from .. import options
-from ..helpers.datetime import reltime
+from ..helpers.datetime import parse_psql_date_str, reltime
 
 
 def maintenance(enabled: bool) -> str:
@@ -28,7 +28,6 @@ def apps():
     List your applications
     """
     from texttable import Texttable
-    from datetime import datetime
     cli.user()
 
     with click_spinner.spinner():
@@ -43,11 +42,7 @@ def apps():
     all_apps = [['NAME', 'STATE', 'CREATED']]
     for app in res:
         count += 1
-        ts = app['timestamp']
-        assert isinstance(ts, str)
-        # Replace the ":" in the timezone field for datetime.
-        datetime_ts = ts[0:ts.rindex(':')] + ts[ts.rindex(':') + 1:]
-        date = datetime.strptime(datetime_ts, '%Y-%m-%dT%H:%M:%S.%f%z')
+        date = parse_psql_date_str(app['timestamp'])
         all_apps.append([
             app['name'],
             maintenance(app['maintenance']),
