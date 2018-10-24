@@ -31,8 +31,7 @@ http server as client
         # Push the state in Redis.
         redis set key: state value: (json stringify content: {'id': creds['owner_uuid'], 'access_token': token_secret, 'name': user['name'], 'email': user['email'], 'username': user['login']})
         redis expire key: state seconds: 3600  # One hour.
-        request set_header key: 'Content-Type' value: 'text/html; charset=utf-8'
-        request write content: '<!DOCTYPE html> <html> <head>  <meta charset="UTF-8">  <title>Asyncy</title> </head> <body> <div style="width: 416px; margin: 0 auto;">  <h1 style="text-align: center;">Logged in!</h1>  <br>  <span style="text-align: center; display: block;">Head back to your terminal. The future awaits.<br>Cheers 🍻!</span>  <br>  <img src="https://judepereira.com/nocache/bot.svg" height=500/> </div> </body> </html> '
+        request redirect url: 'https://login.asyncy.com/success' query: {'name': user['name']}
 
     # The Asyncy CLI will long poll this endpoint to get login creds.
     when client listen path:'/github/oauth_callback' as request
