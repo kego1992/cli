@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-
-
-from random import choice, random
+from random import choice, randint
 
 
 left = (
@@ -64,4 +62,4 @@ right = (
 
 
 def new():
-    return f'{choice(left)}-{choice(right)}-{int(random()*1000)}'
+    return f'{choice(left)}-{choice(right)}-{randint(1000, 9999)}'
