@@ -13,7 +13,7 @@ classifiers = [
     'Intended Audience :: System Administrators',
     'License :: OSI Approved :: MIT License',
     'Natural Language :: English',
-    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
     'Topic :: Office/Business',
     'Topic :: Software Development :: Build Tools',
 ]
@@ -29,18 +29,21 @@ keywords = [
 ]
 
 requirements = [
+    'asyncio==3.4.3',
     'click-alias==0.1.1a1',
-    'click-didyoumean==0.0.3',
-    'click-help-colors==0.4',
+    'click-help-colors==0.5',
     'click-spinner==0.1.8',
-    'click==6.7',
+    'click==7.0',
     'emoji==0.5.0',
     'mixpanel==4.3.2',
     'prompt-toolkit==2.0.3',
     'Pygments==2.2.0',
     'raven==6.9.0',
-    'requests==2.19.1',
-    'storyscript>=0.2.0',
+    'requests==2.20.0',
+    'storyscript==0.7.1',
+    'texttable==1.4.0',
+    'pyyaml==3.13',
+    'pytz==2018.5'
 ]
 
 

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-
+import json
 import os
 import sys
 
 import click
+
 import emoji
-from storyscript.app import App
 
 from .. import cli
 
@@ -16,11 +16,12 @@ def test(debug):
     """
     Test the Stories
     """
-    assert cli.user()
+    from storyscript.app import App
+    cli.user()
     cli.track('Test Stories')
     click.echo(click.style('Compiling Stories', bold=True))
     try:
-        stories = App.compile(os.getcwd(), debug=debug)
+        stories = json.loads(App.compile(os.getcwd(), debug=debug))
     except Exception as e:
         cli.track('Stories failed')
         cli.sentry.captureException()

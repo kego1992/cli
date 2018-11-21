@@ -6,56 +6,27 @@ import re
 import sys
 
 import click
+
 import click_spinner
+
 import emoji
+
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.lexers import PygmentsLexer
 from prompt_toolkit.styles import Style
+
 from pygments.lexers import PythonLexer
+
 import requests
+
 import storyscript
 from storyscript import compiler, parser
 
-from .. import cli
-
-
-class Scope:
-    def __init__(self):
-        self._levels = [{}]
-
-    def __len__(self):
-        return len(self._levels)
-
-    def __contains__(self, key):
-        for c in self._levels:
-            if key in c:
-                return True
-        return False
-
-    def pop(self):
-        self._levels.pop(0)
-
-    def add(self):
-        self._levels.insert(0, {})
-
-    def update(self, data):
-        self._levels[-1].update(data)
-
-    def dumps(self):
-        # TODO merge a list of keys
-        return json.dumps(self._levels, indent=4)
-
-    def __getitem__(self, key):
-        for c in self._levels:
-            if key in c:
-                return c[key]
-        raise KeyError(f'UndefinedVariable "{key}"')
-
-    def indent(self):
-        return ' ' * (4 * (len(self) - 1))
+from .Scope import Scope
+from ... import cli
 
 
 class Repl:
@@ -254,25 +225,3 @@ class Repl:
 
         with open(filepath, 'w+') as file:
             file.write('\n'.join(self.story) + '\n')
-
-
-@cli.cli.command()
-def interact():
-    """
-    Write Storyscript interactively
-    """
-    assert cli.user()
-    assert cli.running()
-
-    click.echo(
-        click.style('Λsyncy', fg='magenta') + ' ' +
-        cli.version + click.style(' - ', dim=True) +
-        click.style('Storyscript', fg='cyan') + ' ' +
-        storyscript.version
-    )
-
-    try:
-        Repl().interact()
-        click.echo(emoji.emojize(':waving_hand:  Goodbye.'))
-    except KeyboardInterrupt:
-        click.echo(emoji.emojize(':waving_hand:  Goodbye.'))

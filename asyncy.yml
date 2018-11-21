@@ -1,0 +1,6 @@
+secrets:
+  github_client_id: b9b8f0b3023105c45d8a
+  github_client_secret:  # secret
+  graphql:
+    endpoint: https://api.asyncy.com/graphql
+    authentication:  # secret

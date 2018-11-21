@@ -41,7 +41,7 @@ Run
 virtualenv venv --python=python3.7
 source venv/bin/activate
 pip install -r requirements.txt
-python -m cli.main
+TOXENV=true python -m cli.main
 ```
 
 Test

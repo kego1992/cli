@@ -1,18 +1,15 @@
 __all__ = [
+    'apps',
     'bootstrap',
     'config',
-    'debug',
-    'deploy',
     'feeback',
-    'interact',
     'login',
     'logs',
-    'list',
-    'restart',
-    'shutdown',
-    'start',
+    'maintenance',
+    'releases',
     'status',
     'test',
     'update',
     'version',
+    'deploy'
 ]
