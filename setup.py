@@ -13,7 +13,7 @@ classifiers = [
     'Intended Audience :: System Administrators',
     'License :: OSI Approved :: MIT License',
     'Natural Language :: English',
-    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
     'Topic :: Office/Business',
     'Topic :: Software Development :: Build Tools',
 ]
@@ -41,8 +41,8 @@ requirements = [
     'raven==6.9.0',
     'requests==2.20.0',
     'storyscript==0.7.1',
-    'websockets==6.0',
     'texttable==1.4.0',
+    'pyyaml==3.13',
     'pytz==2018.5'
 ]
 
