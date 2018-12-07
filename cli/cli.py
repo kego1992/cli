@@ -123,6 +123,14 @@ def user() -> dict:
                         raise IOError()
 
                     res.raise_for_status()
+                    if res.json().get('beta') is False:
+                        click.echo('We are in private beta.')
+                        click.echo(
+                            'You have been added to our next invite queue.'
+                            ' So, keep your eye on your email for an invite.'
+                        )
+                        sys.exit(1)
+
                     write(res.text, f'{home}/.config')
                     init()
                     break
