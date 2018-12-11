@@ -32,6 +32,8 @@ def releases(app, limit):
     with click_spinner.spinner():
         res = api.Releases.list(app, limit=limit)
 
+    res = sorted(res, key=lambda elem: elem['id'])
+
     if res:
         from texttable import Texttable
         table = Texttable(max_width=800)
