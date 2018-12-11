@@ -38,12 +38,13 @@ def releases(app, limit):
         from texttable import Texttable
         table = Texttable(max_width=800)
         table.set_deco(Texttable.HEADER)
-        table.set_cols_align(['l', 'l', 'l'])
-        all_releases = [['VERSION', 'CREATED', 'MESSAGE']]
+        table.set_cols_align(['l', 'l', 'l', 'l'])
+        all_releases = [['VERSION', 'STATUS', 'CREATED', 'MESSAGE']]
         for release in res:
             date = parse_psql_date_str(release['timestamp'])
             all_releases.append([
                 f'v{release["id"]}',
+                release['state'].capitalize(),
                 reltime(date),
                 release['message']
             ])
