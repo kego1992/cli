@@ -32,8 +32,10 @@ def graphql(query, **variables):
     )
     data = res.json()
     if 'errors' in data:
+        click.echo()
         for error in data['errors']:
-            click.echo(click.style('Error: ', fg='red') + error['message'])
+            click.echo(click.style('Error: ', fg='red') + error['message'],
+                       err=True)
         sys.exit(1)
     return data
 
