@@ -66,7 +66,7 @@ def config_set(variables, app, message):
 
         $ asyncy config:set key=value foo=bar
 
-    To set an environment variable to a specific service use
+    To set an environment variable for a specific service use
 
         $ asyncy config:set twitter.oauth_token=value
 
@@ -82,7 +82,13 @@ def config_set(variables, app, message):
 
     if variables:
         for keyval in variables:
-            key, val = tuple(keyval.split('=', 1))
+            try:
+                key, val = tuple(keyval.split('=', 1))
+            except ValueError:
+                click.echo(f'Config variables must be of the form name=value.'
+                           f'\nGot unexpected pair "{keyval}"', err=True)
+                click.echo(config_set.__doc__.strip())
+                return
             # TODO validate against a regexp pattern
             if '.' in key:
                 service, key = tuple(key.split('.', 1))
