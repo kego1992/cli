@@ -16,7 +16,7 @@ def run():
 
     from storyscript import version
     click.echo(
-        click.style('Λsyncy', fg='magenta') + ' ' +
+        click.style('Asyncy', fg='magenta') + ' ' +
         cli.version + click.style(' - ', dim=True) +
         click.style('Storyscript', fg='cyan') + ' ' +
         version

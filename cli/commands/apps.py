@@ -145,13 +145,14 @@ def apps_create(name, team):
               help='Do not prompt to confirm destruction.')
 def apps_destroy(confirm, app):
     """
-    Destory an application
+    Destroy an application
     """
     cli.user()
+    cli.assert_project()
     cli.track('Destroying application')
     if (
         confirm or
-        click.confirm(f'Do you want to destory "{app}"?', abort=True)
+        click.confirm(f'Do you want to destroy "{app}"?', abort=True)
     ):
         click.echo(f'Destroying application "{app}"...', nl=False)
         with click_spinner.spinner():

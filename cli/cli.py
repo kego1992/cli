@@ -94,7 +94,7 @@ def user() -> dict:
     else:
         click.echo(
             'Hi! Thank you for using ' +
-            click.style('Λsyncy', fg='magenta') + '.'
+            click.style('Asyncy', fg='magenta') + '.'
         )
         click.echo('Please login with GitHub to get started.')
 
@@ -138,7 +138,12 @@ def user() -> dict:
             f'  Welcome {data["name"]}!'
         )
         click.echo()
-        click.echo('You may create or list your apps with:')
+        click.echo('Create a new app with:')
+        print_command('asyncy apps:create')
+
+        click.echo()
+
+        click.echo('To list all your apps:')
         print_command('asyncy apps')
 
         click.echo()
@@ -237,7 +242,7 @@ class Cli(DYMGroup, ClickAliasedGroup,
              help_options_color='magenta')
 def cli():
     """
-    Hello! Welcome to Λsyncy
+    Hello! Welcome to Asyncy
 
     We hope you enjoy and we look forward to your feedback.
 
