@@ -182,6 +182,14 @@ class Apps:
             """,
             app=app
         )
+        if res['data']['app'] is None:
+            click.echo()
+            click.echo(click.style(
+                f'The app "{app}" doesn\'t seem to exist.\n'
+                f'Are you sure you have access to it?',
+                fg='red'), err=True)
+            sys.exit(1)
+
         return res['data']['app']['appUuid']
 
     @staticmethod
