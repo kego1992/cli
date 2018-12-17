@@ -168,7 +168,20 @@ class Releases:
                 }
             }
         )
-        return res['data']['createRelease']['release']
+
+        release_ = res['data']['createRelease']['release']
+
+        changes = 'Code'
+        if payload is None:
+            changes = 'Config'
+
+        cli.track('App Release Created', {
+            'Version': release_['id'],
+            'App name': app,
+            'Changes': changes
+        })
+
+        return release_
 
 
 class Apps:

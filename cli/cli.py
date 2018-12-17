@@ -45,9 +45,12 @@ def get_access_token():
     return data["access_token"]
 
 
-def track(message, extra={}):
+def track(message, extra: dict = None):
     try:
-        extra['version'] = version
+        if extra is None:
+            extra = {}
+
+        extra['CLI version'] = version
         mp.track(str(data['id']), message, extra)
     except Exception:
         # ignore issues with tracking
@@ -91,6 +94,8 @@ def user() -> dict:
     """
     Get the active user
     """
+    global data
+
     if data:
         return data
 
@@ -150,7 +155,15 @@ def user() -> dict:
         print_command('asyncy apps')
 
         click.echo()
-        track('Logged into CLI')
+        track('Login Completed')
+        try:
+            mp.people_set(data['id'], {
+                '$name': data['name'],
+                '$timezone': time.tzname[time.daylight]
+            })
+        except:
+            # Ignore tracking errors
+            pass
         return data
 
 

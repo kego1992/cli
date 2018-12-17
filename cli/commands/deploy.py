@@ -22,9 +22,13 @@ def deploy(app, message):
     with click_spinner.spinner():
         config = Config.get(app)
         payload = json.loads(App.compile(os.getcwd()))
-        Releases.create(config, payload, app, message)
+        release = Releases.create(config, payload, app, message)
     url = f'https://{app}.asyncyapp.com'
     click.echo()
     click.echo(click.style('√', fg='green') +
-               f' Done!\n'
-               f'If your story listens to HTTP requests, visit {url}')
+               f' Version {release["id"]} of your app has '
+               f'been queued for deployment.\n\n'
+               f'Check the deployment status with:')
+    cli.print_command('asyncy releases')
+    click.echo()
+    click.echo(f'If your story listens to HTTP requests, visit {url}')
