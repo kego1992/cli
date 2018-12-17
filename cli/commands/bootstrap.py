@@ -18,10 +18,16 @@ def bootstrap(story):
     """
     Produce example stories as templates to work from.
     """
-    cli.track('Bootstrap story')
     if story != '-':
         data = pkgutil.get_data('cli', f'stories/{story}.story')
         click.echo(data)
+        try:
+            app_name = cli.get_app_name()
+        except:
+            app_name = 'Not created yet'
+
+        cli.track('App Bootstrapped',
+                  {'App name': app_name, 'Template used': story})
 
     else:
         click.echo(click.style('Choose a template', bold=True))

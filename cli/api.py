@@ -27,13 +27,15 @@ def graphql(query, **variables):
         headers={
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': f'Bearer {cli.data["access_token"]}'
+            'Authorization': f'Bearer {cli.get_access_token()}'
         }
     )
     data = res.json()
     if 'errors' in data:
+        click.echo()
         for error in data['errors']:
-            click.echo(click.style('Error: ', fg='red') + error['message'])
+            click.echo(click.style('Error: ', fg='red') + error['message'],
+                       err=True)
         sys.exit(1)
     return data
 
@@ -166,7 +168,20 @@ class Releases:
                 }
             }
         )
-        return res['data']['createRelease']['release']
+
+        release_ = res['data']['createRelease']['release']
+
+        changes = 'Code'
+        if payload is None:
+            changes = 'Config'
+
+        cli.track('App Release Created', {
+            'Version': release_['id'],
+            'App name': app,
+            'Changes': changes
+        })
+
+        return release_
 
 
 class Apps:

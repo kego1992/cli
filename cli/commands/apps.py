@@ -92,7 +92,6 @@ def apps_create(name, team):
     Create a new Asyncy App
     """
     cli.user()
-    cli.track('Creating application')
     asyncy_yaml = cli.find_asyncy_yml()
     if asyncy_yaml is not None:
         click.echo(
@@ -131,6 +130,7 @@ def apps_create(name, team):
         emoji.emojize(':party_popper:') +
         '  You are ready to build your first Asyncy App'
     )
+    cli.track('App Created', {'App name': name})
     click.echo('- [ ] Write some stories')
     click.echo('- [ ] ' + click.style('$ asyncy deploy', fg='magenta'))
     click.echo(
@@ -149,7 +149,6 @@ def apps_destroy(confirm, app):
     """
     cli.user()
     cli.assert_project()
-    cli.track('Destroying application')
     if (
         confirm or
         click.confirm(f'Do you want to destroy "{app}"?', abort=True)
@@ -157,4 +156,5 @@ def apps_destroy(confirm, app):
         click.echo(f'Destroying application "{app}"...', nl=False)
         with click_spinner.spinner():
             api.Apps.destroy(app=app)
+            cli.track('App Destroyed', {'App name': app})
         click.echo(click.style('√', fg='green'))

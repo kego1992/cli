@@ -8,7 +8,8 @@ import pytz
 def parse_psql_date_str(ts: str):
     # Replace the ":" in the timezone field for datetime.
     datetime_ts = ts[0:ts.rindex(':')] + ts[ts.rindex(':') + 1:]
-    return datetime.strptime(datetime_ts, '%Y-%m-%dT%H:%M:%S.%f%z')
+    return datetime.strptime(datetime_ts, '%Y-%m-%dT%H:%M:%S.%f%z')\
+        .astimezone()
 
 
 # https://gist.github.com/deontologician/3503910
