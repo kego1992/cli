@@ -26,14 +26,17 @@ def logs(follow, app):
     cli.user()
     cli.assert_project()
     # cli.track('Show Logs') todo   framework for this globally
-    app_id = Apps.get_uuid_from_hostname(app)
     url = 'https://logs.asyncyapp.com/logs'
+    click.echo(f'Retrieving logs for {app}... ', nl=False)
     with click_spinner.spinner():
+        app_id = Apps.get_uuid_from_hostname(app)
         r = requests.get(url, params={
             'app_id': app_id,
             'access_token': cli.get_access_token()
         })
 
+    click.echo()
+    
     arr = r.json()
     assert isinstance(arr, list)
 
