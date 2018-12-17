@@ -42,7 +42,7 @@ home = os.path.expanduser('~/.asyncy')
 
 
 def get_access_token():
-    return data["access_token"]
+    return data['access_token']
 
 
 def track(message, extra: dict = None):

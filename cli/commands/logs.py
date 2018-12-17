@@ -36,7 +36,7 @@ def logs(follow, app):
         })
 
     click.echo()
-    
+
     arr = r.json()
     assert isinstance(arr, list)
 
