@@ -39,7 +39,10 @@ else:
 
 data = None
 home = os.path.expanduser('~/.asyncy')
-token = None
+
+
+def get_access_token():
+    return data["access_token"]
 
 
 def track(message, extra={}):

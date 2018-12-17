@@ -27,7 +27,7 @@ def graphql(query, **variables):
         headers={
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': f'Bearer {cli.data["access_token"]}'
+            'Authorization': f'Bearer {cli.get_access_token()}'
         }
     )
     data = res.json()
