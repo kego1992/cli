@@ -25,7 +25,7 @@ def logs(follow, app):
 
     cli.user()
     cli.assert_project()
-    # cli.track('Show Logs') todo   framework for this globally
+
     url = 'https://logs.asyncyapp.com/logs'
     click.echo(f'Retrieving logs for {app}... ', nl=False)
     with click_spinner.spinner():
@@ -39,6 +39,8 @@ def logs(follow, app):
     
     arr = r.json()
     assert isinstance(arr, list)
+
+    cli.track('App Logs Retrieved', {'App name': app, 'Log count': len(arr)})
 
     if len(arr) == 0:
         click.echo(f'No logs found for {app}')
