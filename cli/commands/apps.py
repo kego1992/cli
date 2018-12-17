@@ -138,18 +138,22 @@ def apps_create(name, team):
         click.style('$ asyncy bootstrap', fg='magenta') + ' for examples'
     )
 
-    
+
 @cli.cli.command(aliases=['apps:url'])
 @options.app
-@click.option(help='Return your full application url.')
 def apps_url(app):
     """
-    Return the full url of your application.
+    Returns the full url of your application.
     Great to use with $(asyncy apps:url) in bash.
     """
     cli.user()
     cli.assert_project()
-    click.echo(f'https://{app}', nl=False)
+    print_nl = False
+    import os
+    if os.isatty(sys.stdout.fileno()):
+        print_nl = True
+
+    click.echo(f'https://{app}.asyncyapp.com', nl=print_nl)
 
 
 @cli.cli.command(aliases=['apps:destroy'])
