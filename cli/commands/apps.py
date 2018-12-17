@@ -139,6 +139,23 @@ def apps_create(name, team):
     )
 
 
+@cli.cli.command(aliases=['apps:url'])
+@options.app
+def apps_url(app):
+    """
+    Returns the full url of your application.
+    Great to use with $(asyncy apps:url) in bash.
+    """
+    cli.user()
+    cli.assert_project()
+    print_nl = False
+    import os
+    if os.isatty(sys.stdout.fileno()):
+        print_nl = True
+
+    click.echo(f'https://{app}.asyncyapp.com', nl=print_nl)
+
+
 @cli.cli.command(aliases=['apps:destroy'])
 @options.app
 @click.option('--confirm', is_flag=True,
