@@ -16,10 +16,10 @@ def test(debug):
     """
     Test the Stories
     """
-    from storyscript.app import App
+    from storyscript.App import App
     cli.user()
     cli.track('Test Stories')
-    click.echo(click.style('Compiling Stories', bold=True))
+    click.echo(click.style('Compiling Stories...', bold=True))
     try:
         stories = json.loads(App.compile(os.getcwd(), debug=debug))
     except Exception as e:
@@ -30,14 +30,17 @@ def test(debug):
         click.echo(str(e))
     else:
         cli.track('Stories passed')
-        cli.write(stories, f'{cli.home}/stories.json')
         if stories['stories'] == {}:
-            click.echo(click.style('   X', fg='red') + ' No stories found')
+            click.echo(click.style('\tX', fg='red') + ' No stories found')
             sys.exit(1)
         else:
-            click.echo(click.style('   √', fg='green') + ' Stories built.')
+            for k, v in stories['stories'].items():
+                click.echo(click.style('\t√', fg='green') + f' {k}')
 
         # click.echo(click.style('Checking Services', bold=True))
 
         click.echo(click.style('√', fg='green') +
                    emoji.emojize(' Looking good! :thumbs_up:'))
+        click.echo()
+        click.echo('Deploy your app with:')
+        cli.print_command('asyncy deploy')
