@@ -112,7 +112,7 @@ def user() -> dict:
             'state': state
         }
 
-        url = f'https://login.asyncyapp.com/github?{urlencode(query)}'
+        url = f'https://stories.asyncyapp.com/github?{urlencode(query)}'
 
         click.launch(url)
         click.echo()
@@ -124,7 +124,7 @@ def user() -> dict:
         with click_spinner.spinner():
             while True:
                 try:
-                    url = 'https://login.asyncyapp.com/github/oauth_callback'
+                    url = 'https://stories.asyncyapp.com/github/oauth_callback'
                     res = requests.get(f'{url}?state={state}')
 
                     if res.text == 'null':

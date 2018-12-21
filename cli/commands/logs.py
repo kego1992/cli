@@ -26,7 +26,7 @@ def logs(follow, app):
     cli.user()
     cli.assert_project()
 
-    url = 'https://logs.asyncyapp.com/logs'
+    url = 'https://stories.asyncyapp.com/logs'
     click.echo(f'Retrieving logs for {app}... ', nl=False)
     with click_spinner.spinner():
         app_id = Apps.get_uuid_from_hostname(app)
