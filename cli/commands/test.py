@@ -16,7 +16,7 @@ def test(debug):
     """
     Test the Stories
     """
-    from storyscript.app import App
+    from storyscript.App import App
     cli.user()
     cli.track('Test Stories')
     click.echo(click.style('Compiling Stories...', bold=True))

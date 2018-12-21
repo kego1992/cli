@@ -6,7 +6,7 @@ import click
 
 import click_spinner
 
-from storyscript.app import App
+from storyscript.App import App
 
 from .. import cli, options
 from ..api import Config, Releases
