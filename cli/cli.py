@@ -162,15 +162,17 @@ def user() -> dict:
         track('Login Completed')
         try:
             if enable_reporting:
-                requests.post('https://stories.asyncyapp.com/track/profile', json={
-                    'id': str(data['id']),
-                    'profile': {
-                        'Name': data['name'],
-                        'Email': data.get('email'),
-                        'GitHub Username': data.get('username'),
-                        'Timezone': time.tzname[time.daylight]
-                    }
-                })
+                requests.post(
+                    'https://stories.asyncyapp.com/track/profile',
+                    json={
+                        'id': str(data['id']),
+                        'profile': {
+                            'Name': data['name'],
+                            'Email': data.get('email'),
+                            'GitHub Username': data.get('username'),
+                            'Timezone': time.tzname[time.daylight]
+                        }
+                    })
         except:
             # Ignore tracking errors
             pass
