@@ -18,8 +18,6 @@ import click_spinner
 
 import emoji
 
-from mixpanel import Mixpanel
-
 from raven import Client
 
 import requests
@@ -29,12 +27,12 @@ from .version import version
 
 
 if not os.getenv('TOXENV'):
-    mp = Mixpanel('c207b744ee33522b9c0d363c71ff6122')
+    enable_reporting = True
     sentry = Client(
         'https://007e7d135737487f97f5fe87d5d85b55@sentry.io/1206504'
     )
 else:
-    mp = None
+    enable_reporting = False
     sentry = Client()
 
 data = None
@@ -45,13 +43,19 @@ def get_access_token():
     return data['access_token']
 
 
-def track(message, extra: dict = None):
+def track(event_name, extra: dict = None):
     try:
         if extra is None:
             extra = {}
 
         extra['CLI version'] = version
-        mp.track(str(data['id']), message, extra)
+
+        if enable_reporting:
+            requests.post('https://stories.asyncyapp.com/track/event', json={
+                'id': str(data['id']),
+                'event_name': event_name,
+                'event_props': extra
+            })
     except Exception:
         # ignore issues with tracking
         pass
@@ -157,10 +161,16 @@ def user() -> dict:
         click.echo()
         track('Login Completed')
         try:
-            mp.people_set(data['id'], {
-                '$name': data['name'],
-                '$timezone': time.tzname[time.daylight]
-            })
+            if enable_reporting:
+                requests.post('https://stories.asyncyapp.com/track/profile', json={
+                    'id': str(data['id']),
+                    'profile': {
+                        'Name': data['name'],
+                        'Email': data.get('email'),
+                        'GitHub Username': data.get('username'),
+                        'Timezone': time.tzname[time.daylight]
+                    }
+                })
         except:
             # Ignore tracking errors
             pass
