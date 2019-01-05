@@ -23,6 +23,7 @@ from raven import Client
 import requests
 
 from .helpers.didyoumean import DYMGroup
+from .helpers.update_notifier import notify
 from .version import version
 
 
@@ -277,3 +278,8 @@ def cli():
     Documentation: https://docs.asyncy.com
     """
     init()
+
+
+@cli.resultcallback()
+def process_result(result):
+    return notify('asyncy')
